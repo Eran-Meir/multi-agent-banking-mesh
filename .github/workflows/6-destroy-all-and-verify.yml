@@ -26,4 +26,6 @@ jobs:
         terraform destroy -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}" -var="environment=prod" || true
       working-directory: infrastructure/terraform/environments/prod
     - name: Final Verification
-      run: echo "Attempting to verify $0 billing footprint via gcloud (simulated)" && gcloud compute instances list
+      run: |
+        chmod +x infrastructure/verify-nuke.sh
+        infrastructure/verify-nuke.sh ${{ vars.GCP_PROJECT_ID }}

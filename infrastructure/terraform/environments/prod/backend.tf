@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "YOUR_PROJECT_ID-tfstate-prod"
+    bucket = "erx-agent-bank-core-dev-01-tf-state"
     prefix = "terraform/state/prod"
   }
 }
