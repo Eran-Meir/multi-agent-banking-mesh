@@ -53,13 +53,11 @@ gcloud iam service-accounts create "$SA_NAME" \
 
 # Grant Editor and Project IAM Admin roles to the SA so it can manage infrastructure
 echo "Granting roles to Service Account..."
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:${SA_EMAIL}" \
-  --role="roles/editor"
-
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:${SA_EMAIL}" \
-  --role="roles/resourcemanager.projectIamAdmin"
+for role in roles/editor roles/resourcemanager.projectIamAdmin roles/secretmanager.admin; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:${SA_EMAIL}" \
+    --role="$role"
+done
 
 # 5. Create Workload Identity Pool
 echo "Creating Workload Identity Pool: $POOL_NAME"
