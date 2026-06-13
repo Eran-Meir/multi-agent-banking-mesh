@@ -11,19 +11,19 @@ jobs:
     - id: auth
       uses: google-github-actions/auth@v1
       with:
-        workload_identity_provider: '$${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
-        service_account: '$${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+        workload_identity_provider: '${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
     - name: Terraform Init & Destroy Test
       run: |
-        terraform init -backend-config="bucket=$${{ vars.GCP_TF_STATE_BUCKET }}"
-        terraform destroy -auto-approve -var="project_id=$${{ vars.GCP_PROJECT_ID }}" -var="environment=test" || true
+        terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
+        terraform destroy -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}" -var="environment=test" || true
       working-directory: infrastructure/terraform/environments/test
     - name: Terraform Init & Destroy Prod
       run: |
-        terraform init -backend-config="bucket=$${{ vars.GCP_TF_STATE_BUCKET }}"
-        terraform destroy -auto-approve -var="project_id=$${{ vars.GCP_PROJECT_ID }}" -var="environment=prod" || true
+        terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
+        terraform destroy -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}" -var="environment=prod" || true
       working-directory: infrastructure/terraform/environments/prod
     - name: Final Verification
       run: echo "Attempting to verify $0 billing footprint via gcloud (simulated)" && gcloud compute instances list

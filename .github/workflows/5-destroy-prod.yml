@@ -11,13 +11,13 @@ jobs:
     - id: auth
       uses: google-github-actions/auth@v1
       with:
-        workload_identity_provider: '$${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
-        service_account: '$${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+        workload_identity_provider: '${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
     - name: Terraform Init
-      run: terraform init -backend-config="bucket=$${{ vars.GCP_TF_STATE_BUCKET }}"
+      run: terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
       working-directory: infrastructure/terraform/environments/prod
     - name: Terraform Destroy
-      run: terraform destroy -auto-approve -var="project_id=$${{ vars.GCP_PROJECT_ID }}" -var="environment=prod"
+      run: terraform destroy -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}" -var="environment=prod"
       working-directory: infrastructure/terraform/environments/prod
