@@ -37,3 +37,9 @@ module "killswitch" {
   billing_topic_id = module.billing.billing_topic_id
 }
 
+module "artifact_registry" {
+  source        = "../../modules/artifact_registry"
+  project_id    = var.project_id
+  region        = var.region
+  repository_id = "${var.environment}-banking-mesh-repo"
+}

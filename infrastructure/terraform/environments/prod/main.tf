@@ -18,6 +18,27 @@ module "gke" {
   subnet_name  = module.vpc.subnet_name
 }
 
+module "billing" {
+  source             = "../../modules/billing"
+  project_id         = var.project_id
+  # Note: You need a billing account ID for prod, using a dummy or ignoring budget for prod if not specified
+  billing_account_id = "014236-1449C2-E83270"
+}
+
+module "killswitch" {
+  source           = "../../modules/killswitch"
+  project_id       = var.project_id
+  region           = var.region
+  billing_topic_id = module.billing.billing_topic_id
+}
+
+module "artifact_registry" {
+  source        = "../../modules/artifact_registry"
+  project_id    = var.project_id
+  region        = var.region
+  repository_id = "${var.environment}-banking-mesh-repo"
+}
+
 module "monitoring" {
   source         = "../../modules/monitoring"
   project_id     = var.project_id

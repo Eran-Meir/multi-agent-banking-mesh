@@ -25,3 +25,22 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -auto-approve -var="project_id=${{ vars.GCP_PROJECT_ID }}" -var="environment=test"
       working-directory: infrastructure/terraform/environments/test
+    - name: Configure Docker Auth
+      run: gcloud auth configure-docker me-west1-docker.pkg.dev --quiet
+    - name: Build and Push Docker Image
+      run: |
+        IMAGE_NAME="me-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/test-banking-mesh-repo/orchestrator:${{ github.sha }}"
+        docker build -t $IMAGE_NAME .
+        docker push $IMAGE_NAME
+    - name: Configure GKE Credentials
+      uses: google-github-actions/get-gke-credentials@v1
+      with:
+        cluster_name: test-banking-mesh-gke
+        location: me-west1
+        project_id: ${{ vars.GCP_PROJECT_ID }}
+    - name: Deploy to Kubernetes
+      run: |
+        IMAGE_NAME="me-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/test-banking-mesh-repo/orchestrator:${{ github.sha }}"
+        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" infrastructure/k8s/orchestrator.yaml
+        sed -i "s|ENV_PLACEHOLDER|test|g" infrastructure/k8s/orchestrator.yaml
+        kubectl apply -f infrastructure/k8s/orchestrator.yaml
