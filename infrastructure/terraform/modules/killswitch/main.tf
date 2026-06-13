@@ -62,5 +62,5 @@ resource "google_secret_manager_secret_iam_member" "secret_accessor" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.github_pat.id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:$${google_cloudfunctions2_function.killswitch.service_config[0].service_account_email}"
+  member    = "serviceAccount:${google_cloudfunctions2_function.killswitch.service_config[0].service_account_email}"
 }
