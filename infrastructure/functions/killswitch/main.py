@@ -4,6 +4,12 @@ import os
 import requests
 from google.cloud import secretmanager
 
+# --- Configuration Constants ---
+DEFAULT_COST_FALLBACK = 0.0
+DEFAULT_BUDGET_LIMIT = 9.0
+DEFAULT_CURRENCY = "USD"
+SUCCESS_HTTP_STATUS = 200
+
 def get_github_token(project_id):
     client = secretmanager.SecretManagerServiceClient()
     name = f"projects/{project_id}/secrets/github-pat/versions/latest"
@@ -15,13 +21,15 @@ def killswitch(event, context):
         pubsub_message = base64.b64decode(event['data']).decode('utf-8')
         data = json.loads(pubsub_message)
         
-        cost_amount = data.get('costAmount', 0)
-        budget_amount = data.get('budgetAmount', 9)
+        # Read values from Pub/Sub JSON payload
+        cost_amount = float(data.get('costAmount', DEFAULT_COST_FALLBACK))
+        budget_amount = float(data.get('budgetAmount', DEFAULT_BUDGET_LIMIT))
+        currency_code = data.get('currencyCode', DEFAULT_CURRENCY)
         
-        print(f"Received billing alert. Cost: {cost_amount}, Budget: {budget_amount}")
+        print(f"Received billing alert. Cost: {cost_amount} {currency_code}, Budget Limit: {budget_amount} {currency_code}")
         
         if cost_amount >= budget_amount:
-            print("BUDGET EXCEEDED! Initiating automated killswitch.")
+            print(f"BUDGET EXCEEDED ({cost_amount} >= {budget_amount} {currency_code})! Initiating automated killswitch.")
             project_id = os.environ.get('GCP_PROJECT')
             github_repo = os.environ.get('GITHUB_REPO', 'Eran-Meir/multi-agent-banking-mesh')
             
