@@ -1,4 +1,4 @@
-﻿provider "google" {
+provider "google" {
   project = var.project_id
   region  = var.region
 }
@@ -17,3 +17,10 @@ module "gke" {
   network_name = module.vpc.network_name
   subnet_name  = module.vpc.subnet_name
 }
+
+module "monitoring" {
+  source         = "../../modules/monitoring"
+  project_id     = var.project_id
+  dashboard_name = "${var.environment}-banking-mesh-dashboard"
+}
+

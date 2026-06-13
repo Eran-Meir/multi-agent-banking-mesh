@@ -1,0 +1,26 @@
+name: 1. Auto-Deploy to Test
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: 'read'
+  id-token: 'write'
+jobs:
+  deploy-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - id: auth
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: '$${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '$${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+    - name: Terraform Init
+      run: terraform init -backend-config="bucket=$${{ vars.GCP_TF_STATE_BUCKET }}"
+      working-directory: infrastructure/terraform/environments/test
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -var="project_id=$${{ vars.GCP_PROJECT_ID }}" -var="environment=test"
+      working-directory: infrastructure/terraform/environments/test
