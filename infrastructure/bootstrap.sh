@@ -9,7 +9,7 @@ set -e
 # CONFIGURATION
 # ==========================================
 # Replace these with your actual values
-PROJECT_ID="your-gcp-project-id"
+PROJECT_ID="erx-agent-bank-core-dev-01"
 GITHUB_REPO="Eran-Meir/multi-agent-banking-mesh" # e.g., username/repo
 REGION="me-west1"
 
