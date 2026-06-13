@@ -1,6 +1,8 @@
 import base64
 import json
 import os
+from typing import Dict, Any
+
 import requests
 from google.cloud import secretmanager
 
@@ -8,15 +10,27 @@ from google.cloud import secretmanager
 DEFAULT_COST_FALLBACK = 0.0
 DEFAULT_BUDGET_LIMIT = 9.0
 DEFAULT_CURRENCY = "USD"
-SUCCESS_HTTP_STATUS = 200
+DEFAULT_GITHUB_REPO = "Eran-Meir/multi-agent-banking-mesh"
 
-def get_github_token(project_id):
+GITHUB_API_VERSION = "2022-11-28"
+GITHUB_ACCEPT_HEADER = "application/vnd.github+json"
+NUKE_WORKFLOW_FILENAME = "6-destroy-all-and-verify.yml"
+TARGET_BRANCH = "main"
+
+def get_github_token(project_id: str) -> str:
+    """
+    Retrieves the GitHub Personal Access Token from GCP Secret Manager.
+    """
     client = secretmanager.SecretManagerServiceClient()
     name = f"projects/{project_id}/secrets/github-pat/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
 
-def killswitch(event, context):
+def killswitch(event: Dict[str, Any], context: Any) -> None:
+    """
+    Cloud Function triggered by Pub/Sub to monitor billing and trigger
+    a GitHub Action if the budget threshold is exceeded.
+    """
     try:
         pubsub_message = base64.b64decode(event['data']).decode('utf-8')
         data = json.loads(pubsub_message)
@@ -30,18 +44,21 @@ def killswitch(event, context):
         
         if cost_amount >= budget_amount:
             print(f"BUDGET EXCEEDED ({cost_amount} >= {budget_amount} {currency_code})! Initiating automated killswitch.")
-            project_id = os.environ.get('GCP_PROJECT')
-            github_repo = os.environ.get('GITHUB_REPO', 'Eran-Meir/multi-agent-banking-mesh')
             
+            project_id = os.environ.get('GCP_PROJECT')
+            if not project_id:
+                raise ValueError("GCP_PROJECT environment variable is missing.")
+                
+            github_repo = os.environ.get('GITHUB_REPO', DEFAULT_GITHUB_REPO)
             token = get_github_token(project_id)
             
-            url = f"https://api.github.com/repos/{github_repo}/actions/workflows/6-destroy-all-and-verify.yml/dispatches"
+            url = f"https://api.github.com/repos/{github_repo}/actions/workflows/{NUKE_WORKFLOW_FILENAME}/dispatches"
             headers = {
-                "Accept": "application/vnd.github+json",
+                "Accept": GITHUB_ACCEPT_HEADER,
                 "Authorization": f"Bearer {token}",
-                "X-GitHub-Api-Version": "2022-11-28"
+                "X-GitHub-Api-Version": GITHUB_API_VERSION
             }
-            payload = {"ref": "main"}
+            payload = {"ref": TARGET_BRANCH}
             
             response = requests.post(url, headers=headers, json=payload)
             print(f"GitHub Action trigger response: {response.status_code}")

@@ -1,14 +1,27 @@
-﻿from fastapi import FastAPI
 import os
+from typing import Dict, Any
+from fastapi import FastAPI
 
-app = FastAPI()
+# --- Configuration Constants ---
+DEFAULT_AGENT_NAME = "Profiler Agent"
+HEALTH_STATUS_OK = "healthy"
+PROCESS_STATUS_OK = "processed"
 
-AGENT_NAME = os.getenv("AGENT_NAME", "Unknown Agent")
+# Initialize FastAPI application
+app = FastAPI(title=DEFAULT_AGENT_NAME)
 
-@app.get("/")
-def health_check():
-    return {"status": "healthy", "agent": AGENT_NAME}
+AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 
-@app.post("/process")
-def process_event(event: dict):
-    return {"status": "processed", "agent": AGENT_NAME, "event": event}
+@app.get("/", response_model=Dict[str, str])
+def health_check() -> Dict[str, str]:
+    """
+    Health check endpoint to verify the agent is running.
+    """
+    return {"status": HEALTH_STATUS_OK, "agent": AGENT_NAME}
+
+@app.post("/process", response_model=Dict[str, Any])
+def process_event(event: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Process an incoming event payload.
+    """
+    return {"status": PROCESS_STATUS_OK, "agent": AGENT_NAME, "event": event}
