@@ -8,9 +8,10 @@ resource "google_secret_manager_secret" "github_pat" {
 }
 
 resource "google_storage_bucket" "function_bucket" {
-  name     = "${var.project_id}-killswitch-src"
-  location = var.region
-  project  = var.project_id
+  name          = "${var.project_id}-killswitch-src"
+  location      = var.region
+  project       = var.project_id
+  force_destroy = true
 }
 
 data "archive_file" "source" {
