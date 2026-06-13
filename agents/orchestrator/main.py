@@ -17,7 +17,11 @@ def health_check() -> Dict[str, str]:
     """
     Health check endpoint to verify the agent is running.
     """
-    return {"status": HEALTH_STATUS_OK, "agent": AGENT_NAME}
+    return {
+        "message": "Hello World from the Banking Mesh Orchestrator!",
+        "status": HEALTH_STATUS_OK, 
+        "agent": AGENT_NAME
+    }
 
 @app.post("/process", response_model=Dict[str, Any])
 def process_event(event: Dict[str, Any]) -> Dict[str, Any]:
