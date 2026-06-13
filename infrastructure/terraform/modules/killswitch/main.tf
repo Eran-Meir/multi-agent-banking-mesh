@@ -8,7 +8,7 @@ resource "google_secret_manager_secret" "github_pat" {
 }
 
 resource "google_storage_bucket" "function_bucket" {
-  name     = "$${var.project_id}-killswitch-src"
+  name     = "${var.project_id}-killswitch-src"
   location = var.region
   project  = var.project_id
 }
@@ -20,7 +20,7 @@ data "archive_file" "source" {
 }
 
 resource "google_storage_bucket_object" "zip" {
-  name   = "killswitch-$${data.archive_file.source.output_md5}.zip"
+  name   = "killswitch-${data.archive_file.source.output_md5}.zip"
   bucket = google_storage_bucket.function_bucket.name
   source = data.archive_file.source.output_path
 }

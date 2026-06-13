@@ -8,7 +8,7 @@ resource "google_billing_budget" "budget" {
   display_name    = "Budget Alert Multi-Agent Bank"
 
   budget_filter {
-    projects = ["projects/$${var.project_id}"]
+    projects = ["projects/${var.project_id}"]
   }
 
   amount {
