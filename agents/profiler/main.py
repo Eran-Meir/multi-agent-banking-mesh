@@ -84,7 +84,7 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         )
         
         inferred_summary = ""
-        msg = types.Content(role="user", parts=[types.Part.from_text(prompt)])
+        msg = types.Content(role="user", parts=[types.Part.from_text(text=prompt)])
         async for event in runner.run_async(
             user_id=user_id,
             session_id=f"session_{user_id}",

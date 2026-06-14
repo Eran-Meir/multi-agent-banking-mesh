@@ -109,7 +109,7 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         )
 
         intent = "WEALTH"
-        msg = types.Content(role="user", parts=[types.Part.from_text(f"Message: {message}")])
+        msg = types.Content(role="user", parts=[types.Part.from_text(text=f"Message: {message}")])
         async for event in runner.run_async(
             user_id=user_id,
             session_id=f"session_{user_id}",
