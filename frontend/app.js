@@ -136,17 +136,33 @@ userChatInput.addEventListener('keypress', (e) => {
 });
 
 // --- Analyst Mode Logic ---
-analystChatSend.addEventListener('click', () => {
+analystChatSend.addEventListener('click', async () => {
     const message = analystChatInput.value.trim();
     if (!message) return;
 
     addMessage(analystChatHistory, message, 'user-msg');
     analystChatInput.value = '';
 
-    // Simulate reading the global_trends.json
-    setTimeout(() => {
-        addMessage(analystChatHistory, "Reading global_trends.json... Based on recent aggregated sessions across all pods, the most prominent topics are 'Tesla Options' (40%) and 'Debt Consolidation' (35%).", 'agent-msg');
-    }, 1000);
+    const loadingMsg = document.createElement('div');
+    loadingMsg.className = 'message agent-msg';
+    loadingMsg.innerHTML = '<em>Reading global_trends.json and analyzing data...</em>';
+    analystChatHistory.appendChild(loadingMsg);
+    analystChatHistory.scrollTop = analystChatHistory.scrollHeight;
+
+    try {
+        const res = await fetch(`${ORCHESTRATOR_URL}/analyst/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+        const data = await res.json();
+        
+        analystChatHistory.removeChild(loadingMsg);
+        addMessage(analystChatHistory, data.final_answer, 'agent-msg');
+    } catch (err) {
+        analystChatHistory.removeChild(loadingMsg);
+        addMessage(analystChatHistory, "[Error] Could not reach the Bank Analyst AI backend.", 'agent-msg');
+    }
 });
 
 analystChatInput.addEventListener('keypress', (e) => {

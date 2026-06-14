@@ -34,8 +34,9 @@ profiler_agent = Agent(
     model="gemini-2.5-flash",
     instruction="""
     You are a highly analytical core banking Profiler Agent.
-    Analyze the provided raw transaction and demographic data for a user.
+    Analyze the provided raw transaction, demographic data, and especially the past_interactions array.
     Provide a concise, 2-sentence psychological and financial summary of this user's behavior.
+    If the user has recent past_interactions, prominently mention their active goals or repeated questions.
     Do not repeat the numbers. Deduce their financial personality, risk tolerance, and any red flags.
     """
 )
@@ -67,9 +68,34 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
             raise e
         raise HTTPException(status_code=500, detail=f"Error accessing GCS: {str(e)}")
 
+    import time
+    
     # Fast-Path User Cache
     cached_summary = user_data.get("latest_ai_models_access_summary")
-    if cached_summary:
+    profiler_metadata = user_data.get("profiler_metadata", {
+        "last_evaluated_timestamp": 0,
+        "actions_since_evaluation": 0
+    })
+    
+    current_time = time.time()
+    last_eval = profiler_metadata.get("last_evaluated_timestamp", 0)
+    actions_count = profiler_metadata.get("actions_since_evaluation", 0)
+    
+    # Increment action count (e.g. this chat message)
+    actions_count += 1
+    profiler_metadata["actions_since_evaluation"] = actions_count
+    user_data["profiler_metadata"] = profiler_metadata
+    
+    # Re-evaluate if > 30 days or actions >= 5
+    thirty_days = 30 * 24 * 60 * 60
+    needs_reevaluation = (actions_count >= 5) or ((current_time - last_eval) > thirty_days) or not cached_summary
+    
+    if cached_summary and not needs_reevaluation:
+        # Upload incremented action count but return cache
+        try:
+            blob.upload_from_string(json.dumps(user_data, indent=2), content_type='application/json')
+        except Exception:
+            pass
         return {"user_id": user_id, "summary": cached_summary, "cached": True, "raw_data": user_data}
 
     # Slow-Path Inference
@@ -109,6 +135,8 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
 
     # Cache back to GCS Database
     user_data["latest_ai_models_access_summary"] = inferred_summary
+    user_data["profiler_metadata"]["actions_since_evaluation"] = 0
+    user_data["profiler_metadata"]["last_evaluated_timestamp"] = time.time()
     try:
         blob.upload_from_string(json.dumps(user_data, indent=2), content_type='application/json')
     except Exception as e:
