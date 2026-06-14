@@ -31,6 +31,8 @@ spec:
           value: ENV_PLACEHOLDER
         - name: REGION
           value: REGION_PLACEHOLDER
+        - name: PROJECT_ID
+          value: PROJECT_ID_PLACEHOLDER
 ---
 apiVersion: v1
 kind: Service
@@ -106,6 +108,8 @@ spec:
           value: ENV_PLACEHOLDER
         - name: REGION
           value: REGION_PLACEHOLDER
+        - name: PROJECT_ID
+          value: PROJECT_ID_PLACEHOLDER
 ---
 apiVersion: v1
 kind: Service
