@@ -13,6 +13,27 @@ WEALTH_ADVISOR_URL = os.environ.get("WEALTH_ADVISOR_URL", "http://localhost:8002
 
 app = FastAPI(title=DEFAULT_AGENT_NAME)
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
+REGION = os.environ.get("REGION", "unknown-region")
+
+@app.get("/")
+def health_check() -> Dict[str, str]:
+    import socket
+    return {
+        "message": "Welcome to the Enterprise Multi-Agent Banking Mesh Orchestrator API (v2.1.0)!",
+        "status": HEALTH_STATUS_OK, 
+        "agent": AGENT_NAME,
+        "region": REGION,
+        "pod_id": socket.gethostname()
+    }
+
+@app.get("/stress_test")
+def stress_test(duration: int = 15):
+    import time
+    import math
+    end_time = time.time() + duration
+    while time.time() < end_time:
+        math.factorial(10000)
+    return {"status": "stress test completed", "message": f"CPU spiked for {duration} seconds"}
 
 # Define the ADK Agent for Intent Routing (v2.1.0)
 orchestrator_agent = Agent(
