@@ -1,0 +1,28 @@
+name: 7. Debug K8s
+on:
+  workflow_dispatch:
+permissions:
+  contents: 'read'
+  id-token: 'write'
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: '${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+    - name: Configure GKE Credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: test-banking-mesh-gke
+        location: me-west1
+        project_id: ${{ vars.GCP_PROJECT_ID }}
+    - name: Get Pods
+      run: kubectl get pods -o wide
+    - name: Get Profiler Logs
+      run: kubectl logs deployment/banking-mesh-profiler --all-containers --previous || kubectl logs deployment/banking-mesh-profiler --all-containers
+    - name: Describe Profiler Pod
+      run: kubectl describe pods -l app=profiler
