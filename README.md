@@ -64,11 +64,13 @@ The Test environment is isolated to a single region with a strictly capped Horiz
 
 ```mermaid
 graph TD
-    User((User)) ==> |HTTP Request| Orch[Orchestrator API Gateway]
+    User((User)) ==> |HTTP Request| RLB[Regional Load Balancer]
+    Artifacts[Google Artifact Registry] -.-> |Pulls Image| Orch
+    RLB ==> Orch[Orchestrator API Gateway<br/>Base: 1 Pod]
 
     subgraph Test [Test Environment: me-west1]
         direction TB
-        Orch[Orchestrator<br/>Base: 1 Pod] -.- |HPA Autoscales to 2| OrchR[+1 Replica]
+        Orch -.- |HPA Autoscales to 2| OrchR[+1 Replica]
         
         Orch ==> |Publishes Event| Topic{GCP Pub/Sub Topic}
         
@@ -86,20 +88,25 @@ The Production environment operates in a fully Active-Active multi-region topolo
 ```mermaid
 graph TD
     User((Global User)) ==> |HTTP| GLB[Global Load Balancer]
+    Artifacts[Google Artifact Registry] -.-> |Pulls Image| OrchP
+    Artifacts -.-> |Pulls Image| OrchS
+
+    GLB ==> |Primary Route| RLB_P[Regional Load Balancer]
+    GLB -.-> |Failover Route| RLB_S[Regional Load Balancer]
 
     subgraph Primary [Primary Region: europe-west4]
-        GLB ==> OrchP[Orchestrator<br/>Base: 1 Pod]
+        RLB_P ==> OrchP[Orchestrator<br/>Base: 1 Pod]
         OrchP -.- |HPA Autoscales to 4| OrchP_R[+3 Replicas]
         OrchP ==> TopicP{Pub/Sub Topic}
         TopicP -.-> AnalystP[Expense Analyst<br/>Base: 1 Pod]
-        AnalystP -.- |HPA Autoscales to 10| AnalystP_R[+9 Replicas]
+        AnalystP -.- |HPA Autoscales to 4| AnalystP_R[+3 Replicas]
     end
 
     subgraph Secondary [Secondary Region: europe-west3]
-        GLB -.-> |Active-Active Routing| OrchS[Orchestrator<br/>Base: 1 Pod]
+        RLB_S ==> OrchS[Orchestrator<br/>Base: 1 Pod]
         OrchS -.- |HPA Autoscales to 4| OrchS_R[+3 Replicas]
         OrchS ==> TopicS{Pub/Sub Topic}
         TopicS -.-> AnalystS[Expense Analyst<br/>Base: 1 Pod]
-        AnalystS -.- |HPA Autoscales to 10| AnalystS_R[+9 Replicas]
+        AnalystS -.- |HPA Autoscales to 4| AnalystS_R[+3 Replicas]
     end
 ```
