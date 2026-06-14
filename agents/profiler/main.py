@@ -48,7 +48,7 @@ def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
     # Fast-Path User Cache
     cached_summary = user_data.get("latest_ai_models_access_summary")
     if cached_summary:
-        return {"user_id": user_id, "summary": cached_summary, "cached": True}
+        return {"user_id": user_id, "summary": cached_summary, "cached": True, "raw_data": user_data}
 
     # Slow-Path ADK Inference
     prompt = f"DATA:\n{json.dumps(user_data, indent=2)}"
@@ -64,4 +64,4 @@ def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
     with open(file_path, "w") as f:
         json.dump(user_data, f, indent=2)
 
-    return {"user_id": user_id, "summary": inferred_summary, "cached": False}
+    return {"user_id": user_id, "summary": inferred_summary, "cached": False, "raw_data": user_data}

@@ -35,14 +35,26 @@ btnAnalystMode.addEventListener('click', () => {
     viewUserMode.classList.replace('view-active', 'view-hidden');
 });
 
+const personaNames = {
+    "USER_1": "Sarah Jenkins",
+    "USER_2": "Arthur Pendleton",
+    "USER_3": "David Chen",
+    "USER_4": "Elena Rodriguez",
+    "USER_5": "Marcus Thorne"
+};
+
 // --- Persona Selection (Hydrate JSON Data) ---
 personaSelect.addEventListener('change', async (e) => {
     const userId = e.target.value;
+    const fullName = personaNames[userId];
     userChatInput.disabled = false;
     userChatSend.disabled = false;
     
     // Reset Chat
-    userChatHistory.innerHTML = `<div class="message system-msg">Switched to Persona: ${userId}.</div>`;
+    userChatHistory.innerHTML = `
+        <div class="message system-msg">Switched to Persona: ${fullName}.</div>
+        <div class="message agent-msg">Hello, ${fullName}. What would you like to ask today?</div>
+    `;
     orchestratorThoughts.innerHTML = `<span class="placeholder-text">Awaiting input...</span>`;
 
     try {
