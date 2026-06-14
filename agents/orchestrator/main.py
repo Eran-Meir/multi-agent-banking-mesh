@@ -20,7 +20,7 @@ def health_check() -> Dict[str, str]:
     Health check endpoint to verify the agent is running.
     """
     return {
-        "message": "Hello World from the Banking Mesh Orchestrator!",
+        "message": "Welcome to the Enterprise Multi-Agent Banking Mesh Orchestrator API!",
         "status": HEALTH_STATUS_OK, 
         "agent": AGENT_NAME
     }

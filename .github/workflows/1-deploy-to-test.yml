@@ -56,3 +56,20 @@ jobs:
       run: |
         echo "🚀 Orchestrator is LIVE at: http://${{ env.STATIC_IP }}" >> $GITHUB_STEP_SUMMARY
         echo "Stress Test Endpoint: http://${{ env.STATIC_IP }}/stress_test" >> $GITHUB_STEP_SUMMARY
+    - name: App Tester (Integration Test)
+      run: |
+        echo "Waiting for Orchestrator to become ready on http://${{ env.STATIC_IP }}/..."
+        for i in {1..12}; do
+          RESPONSE=$(curl -s -f "http://${{ env.STATIC_IP }}/" || echo "FAIL")
+          if [[ "$RESPONSE" != "FAIL" ]]; then
+            echo "Response: $RESPONSE"
+            if echo "$RESPONSE" | grep -q "Enterprise Multi-Agent"; then
+              echo "✅ Integration Test Passed! App is returning correct enterprise greeting."
+              exit 0
+            fi
+          fi
+          echo "Waiting 10s..."
+          sleep 10
+        done
+        echo "❌ Integration Test Failed! App did not return expected response within 2 minutes."
+        exit 1

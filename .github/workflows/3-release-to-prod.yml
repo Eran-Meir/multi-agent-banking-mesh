@@ -75,6 +75,43 @@ jobs:
         echo "🚀 Orchestrator Secondary is LIVE at: http://${{ env.STATIC_IP_SEC }}" >> $GITHUB_STEP_SUMMARY
         echo "Primary Stress Test: http://${{ env.STATIC_IP }}/stress_test?duration=30" >> $GITHUB_STEP_SUMMARY
         echo "Secondary Stress Test: http://${{ env.STATIC_IP_SEC }}/stress_test?duration=30" >> $GITHUB_STEP_SUMMARY
+    - name: App Tester (Integration Test)
+      run: |
+        echo "Waiting for Orchestrator Primary to become ready on http://${{ env.STATIC_IP }}/..."
+        for i in {1..12}; do
+          RESPONSE=$(curl -s -f "http://${{ env.STATIC_IP }}/" || echo "FAIL")
+          if [[ "$RESPONSE" != "FAIL" ]]; then
+            echo "Primary Response: $RESPONSE"
+            if echo "$RESPONSE" | grep -q "Enterprise Multi-Agent"; then
+              echo "✅ Primary Region Integration Test Passed!"
+              break
+            fi
+          fi
+          if [ $i -eq 12 ]; then
+            echo "❌ Primary Integration Test Failed!"
+            exit 1
+          fi
+          echo "Waiting 10s..."
+          sleep 10
+        done
+
+        echo "Waiting for Orchestrator Secondary to become ready on http://${{ env.STATIC_IP_SEC }}/..."
+        for i in {1..12}; do
+          RESPONSE=$(curl -s -f "http://${{ env.STATIC_IP_SEC }}/" || echo "FAIL")
+          if [[ "$RESPONSE" != "FAIL" ]]; then
+            echo "Secondary Response: $RESPONSE"
+            if echo "$RESPONSE" | grep -q "Enterprise Multi-Agent"; then
+              echo "✅ Secondary Region Integration Test Passed!"
+              exit 0
+            fi
+          fi
+          if [ $i -eq 12 ]; then
+            echo "❌ Secondary Integration Test Failed!"
+            exit 1
+          fi
+          echo "Waiting 10s..."
+          sleep 10
+        done
     - name: Create Git Tag
       run: |
         VERSION=$(cat VERSION)
