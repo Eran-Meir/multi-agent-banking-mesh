@@ -16,10 +16,10 @@ resource "google_monitoring_dashboard" "dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/pod/uptime\" resource.type=\"k8s_pod\"",
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
                   "aggregation": {
                     "alignmentPeriod": "60s",
-                    "crossSeriesReducer": "REDUCE_SUM",
+                    "crossSeriesReducer": "REDUCE_COUNT",
                     "groupByFields": [
                       "resource.label.location"
                     ],
@@ -41,10 +41,10 @@ resource "google_monitoring_dashboard" "dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/pod/uptime\" resource.type=\"k8s_pod\" resource.label.\"namespace_name\"=\"default\"",
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
                   "aggregation": {
                     "alignmentPeriod": "60s",
-                    "crossSeriesReducer": "REDUCE_SUM",
+                    "crossSeriesReducer": "REDUCE_COUNT",
                     "groupByFields": [
                       "resource.label.pod_name"
                     ],
