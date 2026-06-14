@@ -1,8 +1,5 @@
 name: 1. Auto-Deploy to Test
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 permissions:
   contents: 'read'
