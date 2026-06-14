@@ -8,8 +8,6 @@ on:
 permissions:
   contents: 'write'
   id-token: 'write'
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   deploy-prod:
     runs-on: ubuntu-latest
