@@ -35,8 +35,8 @@ def process_event(event: Dict[str, Any]) -> Dict[str, Any]:
 @app.get("/stress_test")
 def stress_test():
     """Simulates high CPU load for a few seconds to trigger HPA."""
-    # Compute factorial of a large number for 60 seconds to max out CPU
-    end_time = time.time() + 60
+    # Compute factorial of a large number for 30 seconds to max out CPU
+    end_time = time.time() + 30
     while time.time() < end_time:
         math.factorial(10000)
-    return {"status": "stress test completed", "message": "CPU spiked for 60 seconds"}
+    return {"status": "stress test completed", "message": "CPU spiked for 30 seconds"}

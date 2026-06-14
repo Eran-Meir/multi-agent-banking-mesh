@@ -23,8 +23,10 @@ jobs:
     - name: Extract IP and Run Stress Test
       run: |
         STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/test output -raw orchestrator_external_ip)
-        echo "Running real stress test against: http://$STATIC_IP/stress_test"
-        # Fire 5 concurrent requests to ensure we smash the CPU limit and scale out to 3+ pods
-        for i in {1..5}; do curl -s -X GET "http://$STATIC_IP/stress_test" & done
+        # Since the endpoint blocks for 30s, curl will block. We set max-time to 35s so the runner doesn't fail.
+        # Fire 5 concurrent requests to ensure we smash the CPU and scale out.
+        for i in {1..5}; do
+          curl -s --max-time 35 "http://$STATIC_IP/stress_test" > /dev/null &
+        done
         wait
-        echo "Stress test triggered! HPA should be scaling up to at least 3 pods now."
+        echo "Stress test requests fired and completed. Check your GCP dashboard for the CPU spike!"
