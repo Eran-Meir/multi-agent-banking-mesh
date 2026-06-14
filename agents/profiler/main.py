@@ -68,13 +68,19 @@ def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
     if cached_summary:
         return {"user_id": user_id, "summary": cached_summary, "cached": True, "raw_data": user_data}
 
-    # Slow-Path ADK Inference
+    # Slow-Path Inference
     prompt = f"DATA:\n{json.dumps(user_data, indent=2)}"
     try:
-        response = profiler_agent.run(prompt)
-        inferred_summary = response.text
+        from google import genai
+        from google.genai import types
+        client = genai.Client(vertexai=True, project=PROJECT_ID, location=REGION)
+        resp = client.models.generate_content(
+            model=profiler_agent.model,
+            contents=prompt,
+            config=types.GenerateContentConfig(system_instruction=profiler_agent.instruction)
+        )
+        inferred_summary = resp.text
     except Exception as e:
-        # Fallback to allow GCP deployments to test the pods even without keys
         inferred_summary = f"[ADK MOCK INFERENCE] Could not reach Gemini: {e}"
 
     # Cache back to GCS Database

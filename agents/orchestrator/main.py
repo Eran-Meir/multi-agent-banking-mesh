@@ -27,6 +27,7 @@ app.add_middleware(
 
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
+PROJECT_ID = os.environ.get("PROJECT_ID", "unknown-project")
 
 @app.get("/")
 def health_check() -> Dict[str, str]:
@@ -93,10 +94,17 @@ def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         print(f"Warning: Could not reach Profiler at {PROFILER_URL}: {e}")
         user_summary = "[MOCK] Default User Context"
 
-    # 2. Intent Routing via ADK 2.0
+    # 2. Intent Routing
     try:
-        response = orchestrator_agent.run(f"Message: {message}")
-        intent = response.text.strip().upper()
+        from google import genai
+        from google.genai import types
+        client = genai.Client(vertexai=True, project=PROJECT_ID, location=REGION)
+        resp = client.models.generate_content(
+            model=orchestrator_agent.model,
+            contents=f"Message: {message}",
+            config=types.GenerateContentConfig(system_instruction=orchestrator_agent.instruction)
+        )
+        intent = resp.text.strip().upper()
     except Exception as e:
         # Fallback to allow testing without live API keys
         intent = "WEALTH"
