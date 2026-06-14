@@ -41,7 +41,7 @@ def health_check() -> Dict[str, str]:
     return {"status": HEALTH_STATUS_OK, "agent": AGENT_NAME, "region": REGION}
 
 @app.get("/profile/{user_id}", response_model=Dict[str, Any])
-def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
+async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
     """
     Memory Engine Endpoint using ADK.
     Reads JSON data from GCS, runs Agentic Inference, caches the deduction, and returns.
@@ -71,15 +71,25 @@ def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
     # Slow-Path Inference
     prompt = f"DATA:\n{json.dumps(user_data, indent=2)}"
     try:
-        from google import genai
-        from google.genai import types
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=REGION)
-        resp = client.models.generate_content(
-            model=profiler_agent.model,
-            contents=prompt,
-            config=types.GenerateContentConfig(system_instruction=profiler_agent.instruction)
+        from google.adk import Runner
+        from google.adk.sessions.in_memory_session_service import InMemorySessionService
+        from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+        
+        runner = Runner(
+            app_name="profiler_app",
+            agent=profiler_agent,
+            session_service=InMemorySessionService(),
+            artifact_service=InMemoryArtifactService(),
         )
-        inferred_summary = resp.text
+        
+        inferred_summary = ""
+        async for event in runner.run_async(
+            user_id=user_id,
+            session_id=f"session_{user_id}",
+            new_message=prompt
+        ):
+            if event.is_final_response():
+                inferred_summary = event.content
     except Exception as e:
         inferred_summary = f"[ADK MOCK INFERENCE] Could not reach Gemini: {e}"
 
@@ -91,3 +101,4 @@ def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         print(f"Warning: Failed to save cache back to GCS: {e}")
 
     return {"user_id": user_id, "summary": inferred_summary, "cached": False, "raw_data": user_data}
+

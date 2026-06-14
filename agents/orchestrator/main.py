@@ -76,7 +76,7 @@ class ChatRequest(BaseModel):
     message: str
 
 @app.post("/chat", response_model=Dict[str, Any])
-def handle_chat(request: ChatRequest) -> Dict[str, Any]:
+async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
     """
     The main API Gateway entrypoint. 
     Intercepts the message, gets the user context from the Profiler,
@@ -96,15 +96,25 @@ def handle_chat(request: ChatRequest) -> Dict[str, Any]:
 
     # 2. Intent Routing
     try:
-        from google import genai
-        from google.genai import types
-        client = genai.Client(vertexai=True, project=PROJECT_ID, location=REGION)
-        resp = client.models.generate_content(
-            model=orchestrator_agent.model,
-            contents=f"Message: {message}",
-            config=types.GenerateContentConfig(system_instruction=orchestrator_agent.instruction)
+        from google.adk import Runner
+        from google.adk.sessions.in_memory_session_service import InMemorySessionService
+        from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+
+        runner = Runner(
+            app_name="orchestrator_app",
+            agent=orchestrator_agent,
+            session_service=InMemorySessionService(),
+            artifact_service=InMemoryArtifactService(),
         )
-        intent = resp.text.strip().upper()
+
+        intent = "WEALTH"
+        async for event in runner.run_async(
+            user_id=user_id,
+            session_id=f"session_{user_id}",
+            new_message=f"Message: {message}"
+        ):
+            if event.is_final_response():
+                intent = event.content.strip().upper()
     except Exception as e:
         # Fallback to allow testing without live API keys
         intent = "WEALTH"
