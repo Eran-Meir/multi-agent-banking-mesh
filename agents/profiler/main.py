@@ -74,6 +74,7 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         from google.adk import Runner
         from google.adk.sessions.in_memory_session_service import InMemorySessionService
         from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+        from google.genai import types
         
         runner = Runner(
             app_name="profiler_app",
@@ -83,10 +84,11 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         )
         
         inferred_summary = ""
+        msg = types.Content(role="user", parts=[types.Part.from_text(prompt)])
         async for event in runner.run_async(
             user_id=user_id,
             session_id=f"session_{user_id}",
-            new_message=prompt
+            new_message=msg
         ):
             if event.is_final_response():
                 inferred_summary = event.content

@@ -99,6 +99,7 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         from google.adk import Runner
         from google.adk.sessions.in_memory_session_service import InMemorySessionService
         from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
+        from google.genai import types
 
         runner = Runner(
             app_name="orchestrator_app",
@@ -108,10 +109,11 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         )
 
         intent = "WEALTH"
+        msg = types.Content(role="user", parts=[types.Part.from_text(f"Message: {message}")])
         async for event in runner.run_async(
             user_id=user_id,
             session_id=f"session_{user_id}",
-            new_message=f"Message: {message}"
+            new_message=msg
         ):
             if event.is_final_response():
                 intent = event.content.strip().upper()
