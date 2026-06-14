@@ -44,3 +44,8 @@ module "monitoring" {
   project_id     = var.project_id
   dashboard_name = "${var.environment}-banking-mesh-dashboard"
 }
+
+resource "google_compute_address" "orchestrator_ip" {
+  name   = "${var.environment}-orchestrator-ip"
+  region = var.region
+}

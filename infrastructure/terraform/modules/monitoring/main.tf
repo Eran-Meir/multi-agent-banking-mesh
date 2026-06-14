@@ -39,6 +39,23 @@ resource "google_monitoring_dashboard" "dashboard" {
             }
           ]
         }
+      },
+      {
+        "title": "Orchestrator Pod CPU Utilization",
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"container_name\"=\"orchestrator\"",
+                  "aggregation": {
+                    "perSeriesAligner": "ALIGN_RATE"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     ]
   }

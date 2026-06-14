@@ -1,4 +1,6 @@
 import os
+import time
+import math
 from typing import Dict, Any
 from fastapi import FastAPI
 
@@ -29,3 +31,12 @@ def process_event(event: Dict[str, Any]) -> Dict[str, Any]:
     Process an incoming event payload.
     """
     return {"status": PROCESS_STATUS_OK, "agent": AGENT_NAME, "event": event}
+
+@app.get("/stress_test")
+def stress_test():
+    """Simulates high CPU load for a few seconds to trigger HPA."""
+    # Compute factorial of a large number for 60 seconds to max out CPU
+    end_time = time.time() + 60
+    while time.time() < end_time:
+        math.factorial(10000)
+    return {"status": "stress test completed", "message": "CPU spiked for 60 seconds"}

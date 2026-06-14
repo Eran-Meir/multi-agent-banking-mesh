@@ -8,6 +8,8 @@ on:
 permissions:
   contents: 'write'
   id-token: 'write'
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   deploy-prod:
     runs-on: ubuntu-latest
@@ -42,9 +44,16 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         IMAGE_NAME="me-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
+        STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip)
+        echo "STATIC_IP=$STATIC_IP" >> $GITHUB_ENV
         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|ENV_PLACEHOLDER|prod|g" infrastructure/k8s/orchestrator.yaml
+        sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP|g" infrastructure/k8s/orchestrator.yaml
         kubectl apply -f infrastructure/k8s/orchestrator.yaml
+    - name: Extract External IP
+      run: |
+        echo "🚀 Orchestrator is LIVE at: http://${{ env.STATIC_IP }}" >> $GITHUB_STEP_SUMMARY
+        echo "Stress Test Endpoint: http://${{ env.STATIC_IP }}/stress_test" >> $GITHUB_STEP_SUMMARY
     - name: Create Git Tag
       run: |
         git config user.name "GitHub Actions"

@@ -43,3 +43,8 @@ module "artifact_registry" {
   region        = var.region
   repository_id = "${var.environment}-banking-mesh-repo"
 }
+
+resource "google_compute_address" "orchestrator_ip" {
+  name   = "${var.environment}-orchestrator-ip"
+  region = var.region
+}

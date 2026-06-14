@@ -21,10 +21,10 @@ spec:
         - containerPort: 8080
         resources:
           requests:
-            cpu: 250m
+            cpu: 50m
             memory: 256Mi
           limits:
-            cpu: 500m
+            cpu: 100m
             memory: 512Mi
         env:
         - name: ENVIRONMENT
@@ -42,6 +42,7 @@ spec:
       port: 80
       targetPort: 8080
   type: LoadBalancer
+  loadBalancerIP: STATIC_IP_PLACEHOLDER
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -60,4 +61,11 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
