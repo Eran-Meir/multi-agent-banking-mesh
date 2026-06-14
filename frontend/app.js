@@ -17,8 +17,8 @@ const analystChatHistory = document.getElementById('analyst-chat-history');
 const analystChatInput = document.getElementById('analyst-chat-input');
 const analystChatSend = document.getElementById('analyst-chat-send');
 
-// Orchestrator Backend IP (From Terraform/GKE)
-const ORCHESTRATOR_URL = "http://34.165.48.181";
+// Orchestrator Backend API URL (Relative to current domain)
+const ORCHESTRATOR_URL = "";
 
 // --- Mode Toggling ---
 btnUserMode.addEventListener('click', () => {

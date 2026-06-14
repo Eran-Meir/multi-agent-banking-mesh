@@ -12,6 +12,7 @@ PROFILER_URL = os.environ.get("PROFILER_URL", "http://profiler-service:8080")
 WEALTH_ADVISOR_URL = os.environ.get("WEALTH_ADVISOR_URL", "http://localhost:8002")
 
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title=DEFAULT_AGENT_NAME)
 
@@ -21,6 +22,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve the frontend UI directory directly from the cloud Orchestrator
+import os
+if os.path.isdir("frontend"):
+    app.mount("/ui", StaticFiles(directory="frontend", html=True), name="frontend")
 
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
