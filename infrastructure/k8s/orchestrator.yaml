@@ -41,6 +41,11 @@ spec:
           value: REGION_PLACEHOLDER
         - name: PROJECT_ID
           value: PROJECT_ID_PLACEHOLDER
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: banking-mesh-secrets
+              key: GEMINI_API_KEY
 ---
 apiVersion: v1
 kind: Service

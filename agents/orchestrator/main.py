@@ -29,10 +29,9 @@ AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 PROJECT_ID = os.environ.get("PROJECT_ID", "unknown-project")
 
-# Force ADK to use Vertex AI instead of Google AI Studio
-os.environ["GEMINI_VERTEXAI"] = "1"
-os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
-os.environ["GOOGLE_CLOUD_LOCATION"] = REGION
+# Force ADK to use pure API keys instead of Vertex AI workload identity
+if "GEMINI_VERTEXAI" in os.environ:
+    del os.environ["GEMINI_VERTEXAI"]
 
 @app.get("/")
 def health_check() -> Dict[str, str]:
@@ -65,23 +64,24 @@ def get_user_data(user_id: str):
     except Exception as e:
         return {"error": f"Failed to fetch cloud profile for {user_id}: {e}"}
 
-from google.adk.models import google_llm
-from google.genai import Client
-from functools import cached_property
-
-class VertexGemini(google_llm.Gemini):
-    @cached_property
-    def api_client(self) -> Client:
-        return Client(vertexai=True, project=PROJECT_ID, location=REGION)
-
 # Define the ADK Agent for Intent Routing (v2.1.0)
 orchestrator_agent = Agent(
     name="orchestrator_agent",
-    model=VertexGemini(model="gemini-2.5-flash"),
+    model="gemini-2.5-flash",
     instruction="""
     Determine the intent of the following user message. 
     Is the user asking for 'Wealth Advice' (investments, stocks) or 'Expense Analysis' (budgeting, transactions, debt)?
     Reply with exactly one word: WEALTH or EXPENSE.
+    """
+)
+
+# Define the ADK Agent for Conversation Memory Summarization (Phase 6)
+summarizer_agent = Agent(
+    name="summarizer_agent",
+    model="gemini-2.5-flash",
+    instruction="""
+    Summarize the recent interaction between the user and the system in 1-2 sentences. 
+    Keep it extremely concise. Example: "The user asked about Tesla stock options and was routed to the Wealth Advisor."
     """
 )
 
@@ -130,16 +130,17 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         )
 
         intent = "WEALTH"
-        msg = types.Content(role="user", parts=[types.Part.from_text(text=f"Message: {message}")])
+        msg = types.Content(role="user", parts=[types.Part.from_text(text=f"User Context: {user_summary}\n\nMessage: {message}")])
         async for event in runner.run_async(
             user_id=user_id,
-            session_id=f"session_{user_id}",
+            session_id=f"session_orchestrator_{user_id}",
             new_message=msg
         ):
-            if event.is_final_response():
-                intent = event.content.strip().upper()
+            # ADK 2.1 Content parsing
+            if getattr(event, "content", None) and event.content.parts:
+                intent = event.content.parts[0].text.strip().upper()
     except Exception as e:
-        # Fallback to allow testing without live API keys
+        print(f"Orchestrator Routing Error: {e}")
         intent = "WEALTH"
 
     # 3. Route to Downstream Agent Pod
@@ -150,11 +151,47 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         final_answer = f"[Simulated Expense Analyst Response based on ADK Route: {user_summary}]"
         routed_agent = "Expense Analyst"
 
+    # 4. Generate Conversation Summary for Memory Engine
+    memory_summary = ""
+    try:
+        from google.adk import Runner
+        from google.adk.sessions.in_memory_session_service import InMemorySessionService
+        from google.genai import types
+
+        mem_session_service = InMemorySessionService()
+        mem_session_service.create_session_sync(
+            app_name="summarizer_app", 
+            session_id=f"session_mem_{user_id}", 
+            user_id=user_id
+        )
+
+        mem_runner = Runner(
+            app_name="summarizer_app",
+            agent=summarizer_agent,
+            session_service=mem_session_service
+        )
+
+        mem_prompt = f"User Message: {message}\nSystem Action: Routed to {routed_agent}\nSystem Response: {final_answer}"
+        msg = types.Content(role="user", parts=[types.Part.from_text(text=mem_prompt)])
+        
+        async for event in mem_runner.run_async(
+            user_id=user_id,
+            session_id=f"session_mem_{user_id}",
+            new_message=msg
+        ):
+            if getattr(event, "content", None) and event.content.parts:
+                memory_summary += event.content.parts[0].text
+                
+    except Exception as e:
+        print(f"Memory Summarization Error: {e}")
+        memory_summary = "Failed to summarize conversation."
+
     return {
         "status": "success",
         "routed_to": routed_agent,
         "user_context_used": user_summary,
-        "final_answer": final_answer
+        "final_answer": final_answer,
+        "new_memory_summary": memory_summary.strip()
     }
 
 # Serve the frontend UI directory directly from the cloud Orchestrator as a fallback route

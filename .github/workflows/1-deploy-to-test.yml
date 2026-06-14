@@ -53,6 +53,7 @@ jobs:
         sed -i "s|PROJECT_ID_PLACEHOLDER|${{ vars.GCP_PROJECT_ID }}|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|MAX_REPLICAS_PLACEHOLDER|2|g" infrastructure/k8s/orchestrator.yaml
+        kubectl create secret generic banking-mesh-secrets --from-literal=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} --dry-run=client -o yaml | kubectl apply -f -
         kubectl apply -f infrastructure/k8s/orchestrator.yaml
     - name: Extract External IP
       run: |

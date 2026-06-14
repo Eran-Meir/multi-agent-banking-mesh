@@ -51,6 +51,7 @@ jobs:
         sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP|g" primary.yaml
         sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" primary.yaml
         sed -i "s|MAX_REPLICAS_PLACEHOLDER|4|g" primary.yaml
+        kubectl create secret generic banking-mesh-secrets --from-literal=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} --dry-run=client -o yaml | kubectl apply -f -
         kubectl apply -f primary.yaml
     - name: Configure GKE Credentials Secondary
       uses: google-github-actions/get-gke-credentials@v1
@@ -70,6 +71,7 @@ jobs:
         sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP_SEC|g" secondary.yaml
         sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" secondary.yaml
         sed -i "s|MAX_REPLICAS_PLACEHOLDER|4|g" secondary.yaml
+        kubectl create secret generic banking-mesh-secrets --from-literal=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} --dry-run=client -o yaml | kubectl apply -f -
         kubectl apply -f secondary.yaml
     - name: Extract External IPs
       run: |

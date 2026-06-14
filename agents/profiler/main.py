@@ -17,10 +17,9 @@ app = FastAPI(title=DEFAULT_AGENT_NAME)
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 
-# Force ADK to use Vertex AI instead of Google AI Studio
-os.environ["GEMINI_VERTEXAI"] = "1"
-os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
-os.environ["GOOGLE_CLOUD_LOCATION"] = REGION
+# Force ADK to use pure API keys instead of Vertex AI workload identity
+if "GEMINI_VERTEXAI" in os.environ:
+    del os.environ["GEMINI_VERTEXAI"]
 
 # Initialize Storage Client
 try:
@@ -29,19 +28,10 @@ except Exception as e:
     storage_client = None
     print(f"Warning: Could not initialize storage client: {e}")
 
-from google.adk.models import google_llm
-from google.genai import Client
-from functools import cached_property
-
-class VertexGemini(google_llm.Gemini):
-    @cached_property
-    def api_client(self) -> Client:
-        return Client(vertexai=True, project=PROJECT_ID, location=REGION)
-
 # --- Define Profiler Agent ---
 profiler_agent = Agent(
     name="profiler_agent",
-    model=VertexGemini(model="gemini-2.5-flash"),
+    model="gemini-2.5-flash",
     instruction="""
     You are a highly analytical core banking Profiler Agent.
     Analyze the provided raw transaction and demographic data for a user.
@@ -108,11 +98,12 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         msg = types.Content(role="user", parts=[types.Part.from_text(text=prompt)])
         async for event in runner.run_async(
             user_id=user_id,
-            session_id=f"session_{user_id}",
+            session_id=f"session_profiler_{user_id}",
             new_message=msg
         ):
-            if event.is_final_response():
-                inferred_summary = event.content
+            # ADK 2.1 Content parsing
+            if getattr(event, "content", None) and event.content.parts:
+                inferred_summary = event.content.parts[0].text
     except Exception as e:
         inferred_summary = f"[ADK MOCK INFERENCE] Could not reach Gemini: {e}"
 
