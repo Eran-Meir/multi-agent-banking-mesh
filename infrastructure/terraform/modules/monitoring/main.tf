@@ -105,6 +105,31 @@ resource "google_monitoring_dashboard" "dashboard" {
             }
           ]
         }
+      },
+      {
+        "title": "Ephemeral Storage Usage per Pod (bytes)",
+        "xyChart": {
+          "chartOptions": {
+            "mode": "COLOR"
+          },
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"kubernetes.io/container/ephemeral_storage/used_bytes\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\" resource.label.\"cluster_name\"=starts_with(\"${var.cluster_name}\")",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "crossSeriesReducer": "REDUCE_MAX",
+                    "groupByFields": [
+                      "resource.label.pod_name"
+                    ],
+                    "perSeriesAligner": "ALIGN_MAX"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     ]
   }
