@@ -20,6 +20,8 @@ jobs:
         service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_wrapper: false
     - name: Terraform Init
       run: terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
       working-directory: infrastructure/terraform/environments/prod
@@ -35,11 +37,16 @@ jobs:
         IMAGE_NAME="europe-west4-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
         docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
+    - name: Configure GKE Credentials Primary
+      uses: google-github-actions/get-gke-credentials@v1
+      with:
+        cluster_name: prod-banking-mesh-gke
+        location: europe-west4
+        project_id: ${{ vars.GCP_PROJECT_ID }}
     - name: Deploy to Primary Region (europe-west4)
       run: |
-        gcloud container clusters get-credentials prod-banking-mesh-gke --region europe-west4 --project ${{ vars.GCP_PROJECT_ID }}
         IMAGE_NAME="europe-west4-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
-        STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip)
+        STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
         echo "STATIC_IP=$STATIC_IP" >> $GITHUB_ENV
         cp infrastructure/k8s/orchestrator.yaml primary.yaml
         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" primary.yaml
@@ -48,11 +55,16 @@ jobs:
         sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" primary.yaml
         sed -i "s|MAX_REPLICAS_PLACEHOLDER|4|g" primary.yaml
         kubectl apply -f primary.yaml
+    - name: Configure GKE Credentials Secondary
+      uses: google-github-actions/get-gke-credentials@v1
+      with:
+        cluster_name: prod-banking-mesh-gke-sec
+        location: europe-west3
+        project_id: ${{ vars.GCP_PROJECT_ID }}
     - name: Deploy to Secondary Region (europe-west3)
       run: |
-        gcloud container clusters get-credentials prod-banking-mesh-gke-sec --region europe-west3 --project ${{ vars.GCP_PROJECT_ID }}
         IMAGE_NAME="europe-west4-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
-        STATIC_IP_SEC=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip_secondary)
+        STATIC_IP_SEC=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip_secondary | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
         echo "STATIC_IP_SEC=$STATIC_IP_SEC" >> $GITHUB_ENV
         cp infrastructure/k8s/orchestrator.yaml secondary.yaml
         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" secondary.yaml
