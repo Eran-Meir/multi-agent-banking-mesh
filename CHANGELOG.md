@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.4] - 2026-06-14
+### Changed
+- Refactored CI/CD pipeline naming and execution flow to perfectly match the requested sequential workflow order (1-6).
+- Nested and merged the Stress Test and Manual App Test into a single, unified `2. App Test` workflow with interactive checkboxes for streamlined validation.
+
 ## [v1.0.3] - 2026-06-14
 ### Changed
 - Enforced strict Coding Guidelines by removing all "magic numbers" (hardcoded loops and load simulations) across the Orchestrator API and GitHub Actions workflows, replacing them with explicit Configuration Constants.

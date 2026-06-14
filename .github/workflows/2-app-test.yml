@@ -1,4 +1,4 @@
-name: 4. Manual App Test
+name: 2. App Test
 on:
   workflow_dispatch:
     inputs:
@@ -9,13 +9,17 @@ on:
         - test
         - prod
         required: true
+      run_stress_test:
+        type: boolean
+        description: 'Run CPU Stress Test first (To trigger HPA scale-out)'
+        default: false
 
 permissions:
   contents: 'read'
   id-token: 'write'
 
 jobs:
-  test-endpoints:
+  app-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -48,6 +52,33 @@ jobs:
         IP_SEC=$(terraform output -raw orchestrator_external_ip_secondary | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
         echo "PROD_PRI_IP=$IP_PRI" >> $GITHUB_ENV
         echo "PROD_SEC_IP=$IP_SEC" >> $GITHUB_ENV
+
+    - name: Run CPU Stress Test (Test Env)
+      if: inputs.environment == 'test' && inputs.run_stress_test == true
+      run: |
+        echo "Firing concurrent stress tests to Test Env ($TEST_IP)..."
+        TOTAL_STRESS_REQUESTS=5
+        STRESS_DURATION_SEC=15
+        for (( i=1; i<=TOTAL_STRESS_REQUESTS; i++ )); do
+          curl -s --max-time 20 "http://$TEST_IP/stress_test?duration=$STRESS_DURATION_SEC" > /dev/null &
+        done
+        wait
+        echo "Stress test fired! Waiting 60s for HPA to scale out pods before running loadbalancer test..."
+        sleep 60
+
+    - name: Run CPU Stress Test (Prod Env)
+      if: inputs.environment == 'prod' && inputs.run_stress_test == true
+      run: |
+        echo "Firing concurrent stress tests to Prod Primary ($PROD_PRI_IP) and Secondary ($PROD_SEC_IP)..."
+        TOTAL_STRESS_REQUESTS=5
+        STRESS_DURATION_SEC=15
+        for (( i=1; i<=TOTAL_STRESS_REQUESTS; i++ )); do
+          curl -s --max-time 20 "http://$PROD_PRI_IP/stress_test?duration=$STRESS_DURATION_SEC" > /dev/null &
+          curl -s --max-time 20 "http://$PROD_SEC_IP/stress_test?duration=$STRESS_DURATION_SEC" > /dev/null &
+        done
+        wait
+        echo "Stress tests fired! Waiting 60s for HPA to scale out pods before running loadbalancer test..."
+        sleep 60
 
     - name: Run LoadBalancer Test (Test Env)
       if: inputs.environment == 'test'
