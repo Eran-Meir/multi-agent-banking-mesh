@@ -17,6 +17,11 @@ app = FastAPI(title=DEFAULT_AGENT_NAME)
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 
+# Force ADK to use Vertex AI instead of Google AI Studio
+os.environ["GEMINI_VERTEXAI"] = "1"
+os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+os.environ["GOOGLE_CLOUD_LOCATION"] = REGION
+
 # Initialize Storage Client
 try:
     storage_client = storage.Client()

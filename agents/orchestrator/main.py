@@ -29,6 +29,11 @@ AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 PROJECT_ID = os.environ.get("PROJECT_ID", "unknown-project")
 
+# Force ADK to use Vertex AI instead of Google AI Studio
+os.environ["GEMINI_VERTEXAI"] = "1"
+os.environ["GOOGLE_CLOUD_PROJECT"] = PROJECT_ID
+os.environ["GOOGLE_CLOUD_LOCATION"] = REGION
+
 @app.get("/")
 def health_check() -> Dict[str, str]:
     import socket
