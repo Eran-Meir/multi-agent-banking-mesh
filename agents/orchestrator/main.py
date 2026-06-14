@@ -23,10 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve the frontend UI directory directly from the cloud Orchestrator
-import os
-if os.path.isdir("frontend"):
-    app.mount("/ui", StaticFiles(directory="frontend", html=True), name="frontend")
+# UI Mount moved to bottom so API routes take precedence
 
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
@@ -118,3 +115,7 @@ def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         "user_context_used": user_summary,
         "final_answer": final_answer
     }
+
+# Serve the frontend UI directory directly from the cloud Orchestrator as a fallback route
+if os.path.isdir("frontend"):
+    app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
