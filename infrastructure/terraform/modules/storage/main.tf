@@ -14,19 +14,7 @@ resource "google_storage_bucket_object" "user_data" {
   bucket   = google_storage_bucket.data_bucket.name
 }
 
-# Create a Google Service Account for Workload Identity
-resource "google_service_account" "workload_sa" {
-  account_id   = "${var.environment}-mesh-sa"
-  display_name = "Banking Mesh Workload Service Account"
-}
-
-# Grant the GSA access to the Storage Bucket
-resource "google_storage_bucket_iam_member" "sa_storage_admin" {
-  bucket = google_storage_bucket.data_bucket.name
-  role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.workload_sa.email}"
-}
-
-# NOTE: The workload_identity_binding IAM policy is applied manually
-# by the user in Cloud Shell because the deployment pipeline lacks
-# iam.serviceAccounts.setIamPolicy permissions.
+# NOTE: The Google Service Account (test-mesh-sa), the bucket IAM policy,
+# and the workload_identity_binding are all managed manually by the user 
+# in Cloud Shell because the GitHub Actions pipeline lacks the necessary 
+# IAM admin permissions.
