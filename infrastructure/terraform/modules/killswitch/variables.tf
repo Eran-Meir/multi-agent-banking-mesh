@@ -5,3 +5,4 @@ variable "github_repo" {
   type    = string
   default = "Eran-Meir/multi-agent-banking-mesh"
 }
+variable "environment" { type = string }

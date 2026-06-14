@@ -27,13 +27,15 @@ module "monitoring" {
 module "billing" {
   source             = "../../modules/billing"
   project_id         = var.project_id
-  billing_account_id = var.billing_account_id
+  environment        = var.environment
+  billing_account_id = "014236-1449C2-E83270"
 }
 
 module "killswitch" {
   source           = "../../modules/killswitch"
   project_id       = var.project_id
   region           = var.region
+  environment      = var.environment
   billing_topic_id = module.billing.billing_topic_id
 }
 

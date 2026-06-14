@@ -1,6 +1,6 @@
 resource "google_secret_manager_secret" "github_pat" {
   project   = var.project_id
-  secret_id = "github-pat"
+  secret_id = "${var.environment}-github-pat"
 
   replication {
     auto {}
@@ -8,7 +8,7 @@ resource "google_secret_manager_secret" "github_pat" {
 }
 
 resource "google_storage_bucket" "function_bucket" {
-  name          = "${var.project_id}-killswitch-src"
+  name          = "${var.environment}-${var.project_id}-killswitch-src"
   location      = var.region
   project       = var.project_id
   force_destroy = true
@@ -27,7 +27,7 @@ resource "google_storage_bucket_object" "zip" {
 }
 
 resource "google_cloudfunctions2_function" "killswitch" {
-  name        = "billing-killswitch"
+  name        = "${var.environment}-billing-killswitch"
   location    = var.region
   project     = var.project_id
   description = "Triggers GitHub Actions Nuke pipeline when billing threshold is met"
