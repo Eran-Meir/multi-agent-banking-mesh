@@ -1,0 +1,16 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v1.0.0] - 2026-06-14
+### Added
+- Multi-Region Active-Active Production Environment (europe-west4, europe-west3).
+- Test Environment (me-west1) with isolated dashboard and autoscaling bounds.
+- Orchestrator Agent API Gateway baseline.
+- Automated GitHub Actions deployment pipelines for Test and Prod.
+- GKE Autopilot clusters, VPC networks, and Artifact Registries.
+- MQL-based monitoring dashboard for multi-region GKE pod scaling.
+- Automated $9.00/mo Cloud Billing Killswitch using Cloud Functions and Pub/Sub.

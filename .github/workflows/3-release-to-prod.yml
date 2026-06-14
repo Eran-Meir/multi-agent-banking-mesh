@@ -1,10 +1,6 @@
 name: 3. Release to Prod (The Button)
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Release Version Tag (e.g. v1.1.0)'
-        required: true
 permissions:
   contents: 'write'
   id-token: 'write'
@@ -81,7 +77,13 @@ jobs:
         echo "Secondary Stress Test: http://${{ env.STATIC_IP_SEC }}/stress_test?duration=30" >> $GITHUB_STEP_SUMMARY
     - name: Create Git Tag
       run: |
+        VERSION=$(cat VERSION)
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        git tag ${{ github.event.inputs.version }}
-        git push origin ${{ github.event.inputs.version }}
+        # Only tag and push if the tag doesn't already exist
+        if ! git ls-remote --tags origin | grep -q "refs/tags/$VERSION"; then
+          git tag $VERSION
+          git push origin $VERSION
+        else
+          echo "Tag $VERSION already exists. Skipping."
+        fi
