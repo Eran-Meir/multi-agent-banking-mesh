@@ -13,6 +13,11 @@ metadata:
     app: orchestrator
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: orchestrator
@@ -27,6 +32,18 @@ spec:
         image: IMAGE_PLACEHOLDER
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 15
         resources:
           requests:
             cpu: 50m
@@ -95,6 +112,11 @@ metadata:
     app: profiler
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: profiler
@@ -110,6 +132,18 @@ spec:
         args: ["uvicorn", "agents.profiler.main:app", "--host", "0.0.0.0", "--port", "8080"]
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 15
         resources:
           requests:
             cpu: 50m
