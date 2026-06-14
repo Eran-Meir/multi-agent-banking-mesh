@@ -1,0 +1,22 @@
+{
+  "user_id": "USER_1",
+  "latest_ai_models_access_summary": null,
+  "demographics": {
+    "age": 35,
+    "marital_status": "Divorced",
+    "employment_status": "Employed"
+  },
+  "account_summary": {
+    "checking_balance": 150.45,
+    "savings_balance": 0.00,
+    "credit_card_debt": 24500.00,
+    "investment_portfolio_value": 0.00
+  },
+  "recent_transactions": [
+    {"date": "2026-06-10", "merchant": "Divorce Attorney Associates", "amount": -2500.00, "category": "Legal"},
+    {"date": "2026-06-11", "merchant": "Gucci Flagship Store", "amount": -1200.00, "category": "Luxury Retail"},
+    {"date": "2026-06-12", "merchant": "Delta Airlines First Class", "amount": -3400.00, "category": "Travel"},
+    {"date": "2026-06-13", "merchant": "Credit Card Minimum Payment", "amount": -150.00, "category": "Debt Repayment"},
+    {"date": "2026-06-14", "merchant": "Uber Eats", "amount": -85.50, "category": "Dining"}
+  ]
+}

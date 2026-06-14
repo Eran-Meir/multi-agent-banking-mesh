@@ -1,0 +1,22 @@
+{
+  "user_id": "USER_4",
+  "latest_ai_models_access_summary": null,
+  "demographics": {
+    "age": 42,
+    "marital_status": "Married",
+    "employment_status": "Freelancer"
+  },
+  "account_summary": {
+    "checking_balance": 1200.00,
+    "savings_balance": 300.00,
+    "credit_card_debt": 4500.00,
+    "investment_portfolio_value": 1500.00
+  },
+  "recent_transactions": [
+    {"date": "2026-06-02", "merchant": "Client Invoice Payment", "amount": 6500.00, "category": "Income"},
+    {"date": "2026-06-03", "merchant": "Apple Store (MacBook Pro)", "amount": -2400.00, "category": "Business Expenses"},
+    {"date": "2026-06-04", "merchant": "Daycare Services", "amount": -1200.00, "category": "Family"},
+    {"date": "2026-06-10", "merchant": "Amazon Web Services", "amount": -450.00, "category": "Business Expenses"},
+    {"date": "2026-06-14", "merchant": "Target (Diapers & Groceries)", "amount": -320.00, "category": "Family"}
+  ]
+}

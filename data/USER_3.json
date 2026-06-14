@@ -1,0 +1,22 @@
+{
+  "user_id": "USER_3",
+  "latest_ai_models_access_summary": null,
+  "demographics": {
+    "age": 78,
+    "marital_status": "Widowed",
+    "employment_status": "Retired"
+  },
+  "account_summary": {
+    "checking_balance": 4200.00,
+    "savings_balance": 85000.00,
+    "credit_card_debt": 0.00,
+    "investment_portfolio_value": 150000.00
+  },
+  "recent_transactions": [
+    {"date": "2026-06-01", "merchant": "State Pension Deposit", "amount": 1800.00, "category": "Income"},
+    {"date": "2026-06-02", "merchant": "Walgreens Pharmacy", "amount": -215.50, "category": "Medical"},
+    {"date": "2026-06-05", "merchant": "Dr. Smith Cardiology", "amount": -150.00, "category": "Medical"},
+    {"date": "2026-06-10", "merchant": "Walmart Supercenter", "amount": -85.20, "category": "Groceries"},
+    {"date": "2026-06-12", "merchant": "Grandson Birthday Gift", "amount": -100.00, "category": "Gifts"}
+  ]
+}

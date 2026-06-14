@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.0.6] - 2026-06-14
+## [v2.1.0] - 2026-06-14
+### Changed
+- **Major Architectural Pivot:** Ripped out raw `google-genai` manual API chaining. Migrated the Orchestrator and Profiler to **Google ADK 2.0** (`google-adk`).
+- The Orchestrator now uses ADK's native intent routing graph to direct traffic to downstream pods without messy manual LLM parsing.
+- The Profiler now uses an ADK `Agent` to read the sharded JSON database and execute Agentic Inference on user behavioral data.
+
+## [v2.0.0] - 2026-06-14
 ### Added
 - Appended an "Ephemeral Storage Usage per Pod" widget to the Terraform monitoring module to strictly monitor AI agent disk consumption within the GKE Autopilot constraints.
 

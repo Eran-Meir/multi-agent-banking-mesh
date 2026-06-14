@@ -1,0 +1,22 @@
+{
+  "user_id": "USER_2",
+  "latest_ai_models_access_summary": null,
+  "demographics": {
+    "age": 28,
+    "marital_status": "Single",
+    "employment_status": "Tech Entrepreneur"
+  },
+  "account_summary": {
+    "checking_balance": 85000.00,
+    "savings_balance": 250000.00,
+    "credit_card_debt": 0.00,
+    "investment_portfolio_value": 1200000.00
+  },
+  "recent_transactions": [
+    {"date": "2026-06-01", "merchant": "Vanguard Tech ETF Deposit", "amount": -15000.00, "category": "Investments"},
+    {"date": "2026-06-05", "merchant": "Coinbase Crypto Purchase", "amount": -5000.00, "category": "Investments"},
+    {"date": "2026-06-10", "merchant": "Equinox Gym Membership", "amount": -300.00, "category": "Health"},
+    {"date": "2026-06-12", "merchant": "Whole Foods Market", "amount": -180.00, "category": "Groceries"},
+    {"date": "2026-06-14", "merchant": "AngelList Startup Fund", "amount": -25000.00, "category": "Investments"}
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "user_id": "USER_5",
+  "latest_ai_models_access_summary": null,
+  "demographics": {
+    "age": 55,
+    "marital_status": "Married",
+    "employment_status": "Employed"
+  },
+  "account_summary": {
+    "checking_balance": 15000.00,
+    "savings_balance": 40000.00,
+    "credit_card_debt": 800.00,
+    "investment_portfolio_value": 250000.00
+  },
+  "recent_transactions": [
+    {"date": "2026-06-10", "merchant": "Home Depot", "amount": -45.00, "category": "Home"},
+    {"date": "2026-06-11", "merchant": "Netflix Subscription", "amount": -15.99, "category": "Entertainment"},
+    {"date": "2026-06-12", "merchant": "Exxon Gas Station", "amount": -40.00, "category": "Auto"},
+    {"date": "2026-06-14", "merchant": "Electronics Store (Moscow, RU)", "amount": -2500.00, "category": "Electronics"},
+    {"date": "2026-06-14", "merchant": "Jewelry Boutique (Moscow, RU)", "amount": -8400.00, "category": "Luxury Retail"}
+  ]
+}

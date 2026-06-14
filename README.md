@@ -110,3 +110,17 @@ graph TD
         AnalystS -.- |HPA Autoscales to 4| AnalystS_R[+3 Replicas]
     end
 ```
+
+---
+
+## 🧠 Agentic Inference (Dynamic Persona Deduction)
+
+A core tenet of this architecture is that the AI Agents **do not rely on hardcoded database flags**. 
+
+If a user is a reckless spender or currently being actively defrauded, the core banking database does not explicitly state `"status": "fraud"`. It simply provides cold, hard transactional data.
+
+The **Profiler** and **Expense Analyst** agents use *Agentic Inference* to deduce the user's financial personality in real-time. For example:
+- **Detecting Coping Mechanisms:** If a 35-year-old divorced user pays the minimum balance on a $24,000 credit card debt, pays a Divorce Attorney, and then impulsively buys a First Class Delta ticket and Gucci accessories, the AI deduces a high-risk debt spiral and refuses to offer stock recommendations, pivoting instead to debt-management.
+- **Detecting Fraud:** If a 55-year-old user exhibits years of normal suburban grocery spending, but suddenly executes two transactions in Moscow for $8,400 in luxury jewelry, the AI instantly deduces a geographic and behavioral anomaly and triggers a Card Lock protocol. 
+
+The intelligence emerges dynamically from the raw ledger.
