@@ -50,6 +50,7 @@ jobs:
         sed -i "s|ENV_PLACEHOLDER|test|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|REGION_PLACEHOLDER|me-west1|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP|g" infrastructure/k8s/orchestrator.yaml
+        sed -i "s|PROJECT_ID_PLACEHOLDER|${{ vars.GCP_PROJECT_ID }}|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|MAX_REPLICAS_PLACEHOLDER|2|g" infrastructure/k8s/orchestrator.yaml
         kubectl apply -f infrastructure/k8s/orchestrator.yaml

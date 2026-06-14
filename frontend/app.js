@@ -58,8 +58,8 @@ personaSelect.addEventListener('change', async (e) => {
     orchestratorThoughts.innerHTML = `<span class="placeholder-text">Awaiting input...</span>`;
 
     try {
-        // Fetch the raw JSON directly from the Orchestrator's statically served data folder
-        const response = await fetch(`${ORCHESTRATOR_URL}/data/${userId}.json`);
+        // Fetch live cloud memory securely from the Orchestrator's API
+        const response = await fetch(`${ORCHESTRATOR_URL}/user-data/${userId}`);
         if (!response.ok) throw new Error("Could not load data.");
         const data = await response.json();
         

@@ -4,14 +4,25 @@ from typing import Dict, Any
 from fastapi import FastAPI, HTTPException
 from google.adk import Agent
 
+from google.cloud import storage
+
 # --- Configuration Constants ---
 DEFAULT_AGENT_NAME = "Profiler Agent"
 HEALTH_STATUS_OK = "healthy"
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+PROJECT_ID = os.environ.get("PROJECT_ID", "unknown-project")
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "test")
+BUCKET_NAME = f"{ENVIRONMENT}-banking-mesh-data-{PROJECT_ID}"
 
 app = FastAPI(title=DEFAULT_AGENT_NAME)
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
+
+# Initialize Storage Client
+try:
+    storage_client = storage.Client()
+except Exception as e:
+    storage_client = None
+    print(f"Warning: Could not initialize storage client: {e}")
 
 # Define the ADK Agent (Migrated to v2.1.0)
 profiler_agent = Agent(
@@ -25,9 +36,6 @@ profiler_agent = Agent(
     """
 )
 
-def get_user_file_path(user_id: str) -> str:
-    return os.path.join(DATA_DIR, f"{user_id}.json")
-
 @app.get("/")
 def health_check() -> Dict[str, str]:
     return {"status": HEALTH_STATUS_OK, "agent": AGENT_NAME, "region": REGION}
@@ -36,14 +44,24 @@ def health_check() -> Dict[str, str]:
 def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
     """
     Memory Engine Endpoint using ADK.
-    Reads JSON data, runs Agentic Inference, caches the deduction, and returns.
+    Reads JSON data from GCS, runs Agentic Inference, caches the deduction, and returns.
     """
-    file_path = get_user_file_path(user_id)
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail=f"User {user_id} not found.")
+    if not storage_client:
+        raise HTTPException(status_code=500, detail="Storage client not initialized")
 
-    with open(file_path, "r") as f:
-        user_data = json.load(f)
+    try:
+        bucket = storage_client.bucket(BUCKET_NAME)
+        blob = bucket.blob(f"{user_id}.json")
+        
+        if not blob.exists():
+            raise HTTPException(status_code=404, detail=f"User {user_id} not found in bucket {BUCKET_NAME}.")
+            
+        data_str = blob.download_as_string()
+        user_data = json.loads(data_str)
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=f"Error accessing GCS: {str(e)}")
 
     # Fast-Path User Cache
     cached_summary = user_data.get("latest_ai_models_access_summary")
@@ -59,9 +77,11 @@ def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         # Fallback to allow GCP deployments to test the pods even without keys
         inferred_summary = f"[ADK MOCK INFERENCE] Could not reach Gemini: {e}"
 
-    # Cache back to JSON Database
+    # Cache back to GCS Database
     user_data["latest_ai_models_access_summary"] = inferred_summary
-    with open(file_path, "w") as f:
-        json.dump(user_data, f, indent=2)
+    try:
+        blob.upload_from_string(json.dumps(user_data, indent=2), content_type='application/json')
+    except Exception as e:
+        print(f"Warning: Failed to save cache back to GCS: {e}")
 
     return {"user_id": user_id, "summary": inferred_summary, "cached": False, "raw_data": user_data}

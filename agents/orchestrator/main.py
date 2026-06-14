@@ -28,10 +28,6 @@ import os
 if os.path.isdir("frontend"):
     app.mount("/ui", StaticFiles(directory="frontend", html=True), name="frontend")
 
-# Serve the data directory statically so the UI can load it directly
-if os.path.isdir("data"):
-    app.mount("/data", StaticFiles(directory="data"), name="data")
-
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 
@@ -57,9 +53,10 @@ def stress_test(duration: int = 15):
 
 @app.get("/user-data/{user_id}")
 def get_user_data(user_id: str):
-    """Fetch raw JSON from Profiler pod so UI can read live cloud data"""
+    """Fetch profile from Profiler pod which securely reads from GCS"""
+    import requests
     try:
-        resp = requests.get(f"{PROFILER_URL}/profile/{user_id}")
+        resp = requests.get(f"{PROFILER_URL}/profile/{user_id}", timeout=5)
         resp.raise_for_status()
         return resp.json().get("raw_data", {})
     except Exception as e:

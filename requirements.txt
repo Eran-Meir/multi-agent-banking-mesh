@@ -2,3 +2,5 @@ fastapi
 uvicorn
 cachetools
 google-adk
+google-cloud-storage
+requests

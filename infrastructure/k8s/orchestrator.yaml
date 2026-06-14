@@ -1,3 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: banking-mesh-ksa
+  annotations:
+    iam.gke.io/gcp-service-account: ENV_PLACEHOLDER-mesh-sa@PROJECT_ID_PLACEHOLDER.iam.gserviceaccount.com
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,6 +21,7 @@ spec:
       labels:
         app: orchestrator
     spec:
+      serviceAccountName: banking-mesh-ksa
       containers:
       - name: orchestrator
         image: IMAGE_PLACEHOLDER
@@ -88,6 +96,7 @@ spec:
       labels:
         app: profiler
     spec:
+      serviceAccountName: banking-mesh-ksa
       containers:
       - name: profiler
         image: IMAGE_PLACEHOLDER
