@@ -54,3 +54,52 @@ The Wealth Advisor does not guess the bank's internal mortgage rates.
 To ensure strict cost control during development, this repository implements a fully automated **Billing Killswitch**. 
 
 A GCP Budget is wired to a Pub/Sub topic. If infrastructure costs exceed the **$9.00 USD** threshold, an event-driven Gen 2 Cloud Function automatically intercepts the billing alert and fires a payload to GitHub Actions. This immediately triggers the `6. Nuke Everything` pipeline, aggressively destroying all Terraform infrastructure and terminating the project to guarantee a strict $0/month baseline.
+
+---
+
+## 🗺️ Environment Architectures
+
+### Test Environment (Cost-Optimized & Scalable)
+The Test environment is isolated to a single region with a strictly capped Horizontal Pod Autoscaler (HPA) to prove the scaling mechanics without incurring massive costs.
+
+```mermaid
+graph TD
+    User((User)) ==> |HTTP Request| Orch[Orchestrator API Gateway]
+
+    subgraph Test [Test Environment: me-west1]
+        direction TB
+        Orch[Orchestrator<br/>Base: 1 Pod] -.- |HPA Autoscales to 2| OrchR[+1 Replica]
+        
+        Orch ==> |Publishes Event| Topic{GCP Pub/Sub Topic}
+        
+        Topic -.-> |Async Subscribe| Analyst[Expense Analyst<br/>Base: 1 Pod]
+        Analyst -.- |HPA Autoscales to 2| AnalystR[+1 Replica]
+        
+        Topic -.-> |Async Subscribe| Wealth[Wealth Advisor<br/>Base: 1 Pod]
+        Wealth -.- |HPA Autoscales to 2| WealthR[+1 Replica]
+    end
+```
+
+### Production Environment (High-Availability Active-Active)
+The Production environment operates in a fully Active-Active multi-region topology. It handles significantly higher traffic bounds and ensures total failover reliability.
+
+```mermaid
+graph TD
+    User((Global User)) ==> |HTTP| GLB[Global Load Balancer]
+
+    subgraph Primary [Primary Region: europe-west4]
+        GLB ==> OrchP[Orchestrator<br/>Base: 1 Pod]
+        OrchP -.- |HPA Autoscales to 4| OrchP_R[+3 Replicas]
+        OrchP ==> TopicP{Pub/Sub Topic}
+        TopicP -.-> AnalystP[Expense Analyst<br/>Base: 1 Pod]
+        AnalystP -.- |HPA Autoscales to 10| AnalystP_R[+9 Replicas]
+    end
+
+    subgraph Secondary [Secondary Region: europe-west3]
+        GLB -.-> |Active-Active Routing| OrchS[Orchestrator<br/>Base: 1 Pod]
+        OrchS -.- |HPA Autoscales to 4| OrchS_R[+3 Replicas]
+        OrchS ==> TopicS{Pub/Sub Topic}
+        TopicS -.-> AnalystS[Expense Analyst<br/>Base: 1 Pod]
+        AnalystS -.- |HPA Autoscales to 10| AnalystS_R[+9 Replicas]
+    end
+```
