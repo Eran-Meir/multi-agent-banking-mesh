@@ -2,6 +2,9 @@ name: 2. Stress Test (Test Env)
 on: workflow_dispatch
 jobs:
   stress-test:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
