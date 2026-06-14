@@ -65,10 +65,19 @@ def get_user_data(user_id: str):
     except Exception as e:
         return {"error": f"Failed to fetch cloud profile for {user_id}: {e}"}
 
+from google.adk.models import google_llm
+from google.genai import Client
+from functools import cached_property
+
+class VertexGemini(google_llm.Gemini):
+    @cached_property
+    def api_client(self) -> Client:
+        return Client(vertexai=True, project=PROJECT_ID, location=REGION)
+
 # Define the ADK Agent for Intent Routing (v2.1.0)
 orchestrator_agent = Agent(
-    name="orchestrator_router",
-    model="gemini-2.5-flash",
+    name="orchestrator_agent",
+    model=VertexGemini(model="gemini-2.5-flash"),
     instruction="""
     Determine the intent of the following user message. 
     Is the user asking for 'Wealth Advice' (investments, stocks) or 'Expense Analysis' (budgeting, transactions, debt)?

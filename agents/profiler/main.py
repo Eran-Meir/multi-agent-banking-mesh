@@ -29,10 +29,19 @@ except Exception as e:
     storage_client = None
     print(f"Warning: Could not initialize storage client: {e}")
 
-# Define the ADK Agent (Migrated to v2.1.0)
+from google.adk.models import google_llm
+from google.genai import Client
+from functools import cached_property
+
+class VertexGemini(google_llm.Gemini):
+    @cached_property
+    def api_client(self) -> Client:
+        return Client(vertexai=True, project=PROJECT_ID, location=REGION)
+
+# --- Define Profiler Agent ---
 profiler_agent = Agent(
     name="profiler_agent",
-    model="gemini-2.5-flash",
+    model=VertexGemini(model="gemini-2.5-flash"),
     instruction="""
     You are a highly analytical core banking Profiler Agent.
     Analyze the provided raw transaction and demographic data for a user.
