@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: banking-mesh-ksa
   annotations:
-    iam.gke.io/gcp-service-account: ENV_PLACEHOLDER-mesh-sa@PROJECT_ID_PLACEHOLDER.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: ENV_PLACEHOLDER-mesh-sa-v2@PROJECT_ID_PLACEHOLDER.iam.gserviceaccount.com
 ---
 apiVersion: apps/v1
 kind: Deployment
