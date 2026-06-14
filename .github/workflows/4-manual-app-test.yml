@@ -1,0 +1,98 @@
+name: 4. Manual App Test
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Target Environment'
+        options:
+        - test
+        - prod
+        required: true
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  test-endpoints:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: auth
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: '${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_wrapper: false
+
+    - name: Get External IPs (Test)
+      if: inputs.environment == 'test'
+      run: |
+        cd infrastructure/terraform/environments/test
+        terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
+        IP=$(terraform output -raw orchestrator_external_ip | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+        echo "TEST_IP=$IP" >> $GITHUB_ENV
+
+    - name: Get External IPs (Prod)
+      if: inputs.environment == 'prod'
+      run: |
+        cd infrastructure/terraform/environments/prod
+        terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
+        IP_PRI=$(terraform output -raw orchestrator_external_ip | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+        IP_SEC=$(terraform output -raw orchestrator_external_ip_secondary | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+        echo "PROD_PRI_IP=$IP_PRI" >> $GITHUB_ENV
+        echo "PROD_SEC_IP=$IP_SEC" >> $GITHUB_ENV
+
+    - name: Run LoadBalancer Test (Test Env)
+      if: inputs.environment == 'test'
+      run: |
+        echo "Running 20 requests against Test Environment LoadBalancer ($TEST_IP)..."
+        declare -A POD_COUNTS
+        for i in {1..20}; do
+          POD_ID=$(curl -s "http://$TEST_IP/" | jq -r '.pod_id // "UNKNOWN"')
+          echo "Request $i: Handled by $POD_ID"
+          POD_COUNTS["$POD_ID"]=$(( ${POD_COUNTS["$POD_ID"]:-0} + 1 ))
+        done
+        echo "-----------------------------------"
+        echo "LoadBalancer Traffic Distribution:"
+        for pod in "${!POD_COUNTS[@]}"; do
+          echo "- $pod: ${POD_COUNTS[$pod]} requests"
+        done
+
+    - name: Run LoadBalancer Test (Prod Primary Env)
+      if: inputs.environment == 'prod'
+      run: |
+        echo "Running 20 requests against Prod Primary LoadBalancer ($PROD_PRI_IP)..."
+        declare -A POD_COUNTS
+        for i in {1..20}; do
+          POD_ID=$(curl -s "http://$PROD_PRI_IP/" | jq -r '.pod_id // "UNKNOWN"')
+          echo "Request $i: Handled by $POD_ID"
+          POD_COUNTS["$POD_ID"]=$(( ${POD_COUNTS["$POD_ID"]:-0} + 1 ))
+        done
+        echo "-----------------------------------"
+        echo "Primary LoadBalancer Traffic Distribution:"
+        for pod in "${!POD_COUNTS[@]}"; do
+          echo "- $pod: ${POD_COUNTS[$pod]} requests"
+        done
+
+    - name: Run LoadBalancer Test (Prod Secondary Env)
+      if: inputs.environment == 'prod'
+      run: |
+        echo "Running 20 requests against Prod Secondary LoadBalancer ($PROD_SEC_IP)..."
+        declare -A POD_COUNTS
+        for i in {1..20}; do
+          POD_ID=$(curl -s "http://$PROD_SEC_IP/" | jq -r '.pod_id // "UNKNOWN"')
+          echo "Request $i: Handled by $POD_ID"
+          POD_COUNTS["$POD_ID"]=$(( ${POD_COUNTS["$POD_ID"]:-0} + 1 ))
+        done
+        echo "-----------------------------------"
+        echo "Secondary LoadBalancer Traffic Distribution:"
+        for pod in "${!POD_COUNTS[@]}"; do
+          echo "- $pod: ${POD_COUNTS[$pod]} requests"
+        done

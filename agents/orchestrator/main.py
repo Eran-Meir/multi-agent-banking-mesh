@@ -1,6 +1,7 @@
 import os
 import time
 import math
+import socket
 from typing import Dict, Any
 from fastapi import FastAPI
 
@@ -22,7 +23,8 @@ def health_check() -> Dict[str, str]:
     return {
         "message": "Welcome to the Enterprise Multi-Agent Banking Mesh Orchestrator API!",
         "status": HEALTH_STATUS_OK, 
-        "agent": AGENT_NAME
+        "agent": AGENT_NAME,
+        "pod_id": socket.gethostname()
     }
 
 @app.post("/process", response_model=Dict[str, Any])
