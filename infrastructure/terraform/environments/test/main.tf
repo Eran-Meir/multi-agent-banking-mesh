@@ -22,6 +22,7 @@ module "monitoring" {
   source         = "../../modules/monitoring"
   project_id     = var.project_id
   dashboard_name = "${var.environment}-banking-mesh-dashboard"
+  cluster_name   = "${var.environment}-banking-mesh-gke"
 }
 
 module "billing" {

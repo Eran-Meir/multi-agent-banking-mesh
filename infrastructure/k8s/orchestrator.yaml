@@ -53,8 +53,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: banking-mesh-orchestrator
-  minReplicas: 1
-  maxReplicas: 5
+  minReplicas: MIN_REPLICAS_PLACEHOLDER
+  maxReplicas: MAX_REPLICAS_PLACEHOLDER
   metrics:
   - type: Resource
     resource:

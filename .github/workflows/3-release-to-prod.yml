@@ -31,31 +31,44 @@ jobs:
       run: terraform apply -auto-approve -lock=false -var="project_id=${{ vars.GCP_PROJECT_ID }}" -var="environment=prod"
       working-directory: infrastructure/terraform/environments/prod
     - name: Configure Docker Auth
-      run: gcloud auth configure-docker me-west1-docker.pkg.dev --quiet
+      run: gcloud auth configure-docker europe-west4-docker.pkg.dev --quiet
     - name: Build and Push Docker Image
       run: |
-        IMAGE_NAME="me-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
+        IMAGE_NAME="europe-west4-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
         docker build -t $IMAGE_NAME .
         docker push $IMAGE_NAME
-    - name: Configure GKE Credentials
-      uses: google-github-actions/get-gke-credentials@v1
-      with:
-        cluster_name: prod-banking-mesh-gke
-        location: me-west1
-        project_id: ${{ vars.GCP_PROJECT_ID }}
-    - name: Deploy to Kubernetes
+    - name: Deploy to Primary Region (europe-west4)
       run: |
-        IMAGE_NAME="me-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
+        gcloud container clusters get-credentials prod-banking-mesh-gke --region europe-west4 --project ${{ vars.GCP_PROJECT_ID }}
+        IMAGE_NAME="europe-west4-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
         STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip)
         echo "STATIC_IP=$STATIC_IP" >> $GITHUB_ENV
-        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" infrastructure/k8s/orchestrator.yaml
-        sed -i "s|ENV_PLACEHOLDER|prod|g" infrastructure/k8s/orchestrator.yaml
-        sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP|g" infrastructure/k8s/orchestrator.yaml
-        kubectl apply -f infrastructure/k8s/orchestrator.yaml
-    - name: Extract External IP
+        cp infrastructure/k8s/orchestrator.yaml primary.yaml
+        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" primary.yaml
+        sed -i "s|ENV_PLACEHOLDER|prod|g" primary.yaml
+        sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP|g" primary.yaml
+        sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" primary.yaml
+        sed -i "s|MAX_REPLICAS_PLACEHOLDER|4|g" primary.yaml
+        kubectl apply -f primary.yaml
+    - name: Deploy to Secondary Region (europe-west3)
       run: |
-        echo "🚀 Orchestrator is LIVE at: http://${{ env.STATIC_IP }}" >> $GITHUB_STEP_SUMMARY
-        echo "Stress Test Endpoint: http://${{ env.STATIC_IP }}/stress_test" >> $GITHUB_STEP_SUMMARY
+        gcloud container clusters get-credentials prod-banking-mesh-gke-sec --region europe-west3 --project ${{ vars.GCP_PROJECT_ID }}
+        IMAGE_NAME="europe-west4-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/prod-banking-mesh-repo/orchestrator:${{ github.sha }}"
+        STATIC_IP_SEC=$(terraform -chdir=infrastructure/terraform/environments/prod output -raw orchestrator_external_ip_secondary)
+        echo "STATIC_IP_SEC=$STATIC_IP_SEC" >> $GITHUB_ENV
+        cp infrastructure/k8s/orchestrator.yaml secondary.yaml
+        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" secondary.yaml
+        sed -i "s|ENV_PLACEHOLDER|prod|g" secondary.yaml
+        sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP_SEC|g" secondary.yaml
+        sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" secondary.yaml
+        sed -i "s|MAX_REPLICAS_PLACEHOLDER|4|g" secondary.yaml
+        kubectl apply -f secondary.yaml
+    - name: Extract External IPs
+      run: |
+        echo "🚀 Orchestrator Primary is LIVE at: http://${{ env.STATIC_IP }}" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 Orchestrator Secondary is LIVE at: http://${{ env.STATIC_IP_SEC }}" >> $GITHUB_STEP_SUMMARY
+        echo "Primary Stress Test: http://${{ env.STATIC_IP }}/stress_test?duration=30" >> $GITHUB_STEP_SUMMARY
+        echo "Secondary Stress Test: http://${{ env.STATIC_IP_SEC }}/stress_test?duration=30" >> $GITHUB_STEP_SUMMARY
     - name: Create Git Tag
       run: |
         git config user.name "GitHub Actions"

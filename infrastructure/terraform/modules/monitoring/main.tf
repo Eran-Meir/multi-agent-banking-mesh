@@ -16,7 +16,7 @@ resource "google_monitoring_dashboard" "dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\" resource.label.\"cluster_name\"=~\"^${var.cluster_name}.*\"",
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_COUNT",
@@ -41,7 +41,7 @@ resource "google_monitoring_dashboard" "dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\" resource.label.\"cluster_name\"=~\"^${var.cluster_name}.*\"",
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_COUNT",
@@ -66,7 +66,7 @@ resource "google_monitoring_dashboard" "dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\" resource.label.\"cluster_name\"=~\"^${var.cluster_name}.*\"",
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_MEAN",
@@ -91,7 +91,7 @@ resource "google_monitoring_dashboard" "dashboard" {
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/container/memory/used_bytes\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
+                  "filter": "metric.type=\"kubernetes.io/container/memory/used_bytes\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\" resource.label.\"cluster_name\"=~\"^${var.cluster_name}.*\"",
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_MEAN",

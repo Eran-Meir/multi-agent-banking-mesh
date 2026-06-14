@@ -18,6 +18,21 @@ module "gke" {
   subnet_name  = module.vpc.subnet_name
 }
 
+module "vpc_secondary" {
+  source       = "../../modules/vpc"
+  network_name = "${var.environment}-banking-mesh-vpc-sec"
+  region       = "europe-west3"
+}
+
+module "gke_secondary" {
+  source       = "../../modules/gke"
+  project_id   = var.project_id
+  cluster_name = "${var.environment}-banking-mesh-gke-sec"
+  region       = "europe-west3"
+  network_name = module.vpc_secondary.network_name
+  subnet_name  = module.vpc_secondary.subnet_name
+}
+
 module "billing" {
   source             = "../../modules/billing"
   project_id         = var.project_id
@@ -45,9 +60,15 @@ module "monitoring" {
   source         = "../../modules/monitoring"
   project_id     = var.project_id
   dashboard_name = "${var.environment}-banking-mesh-dashboard"
+  cluster_name   = "${var.environment}-banking-mesh-gke"
 }
 
 resource "google_compute_address" "orchestrator_ip" {
   name   = "${var.environment}-orchestrator-ip"
   region = var.region
+}
+
+resource "google_compute_address" "orchestrator_ip_secondary" {
+  name   = "${var.environment}-orchestrator-ip-sec"
+  region = "europe-west3"
 }

@@ -23,10 +23,10 @@ jobs:
     - name: Extract IP and Run Stress Test
       run: |
         STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/test output -raw orchestrator_external_ip)
-        # Since the endpoint blocks for 30s, curl will block. We set max-time to 35s so the runner doesn't fail.
+        # Since the endpoint blocks for 15s, curl will block. We set max-time to 20s so the runner doesn't fail.
         # Fire 5 concurrent requests to ensure we smash the CPU and scale out.
         for i in {1..5}; do
-          curl -s --max-time 35 "http://$STATIC_IP/stress_test" > /dev/null &
+          curl -s --max-time 20 "http://$STATIC_IP/stress_test?duration=15" > /dev/null &
         done
         wait
         echo "Stress test requests fired and completed. Check your GCP dashboard for the CPU spike!"
