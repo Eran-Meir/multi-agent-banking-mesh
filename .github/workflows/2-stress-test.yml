@@ -21,6 +21,7 @@ jobs:
       run: |
         STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/test output -raw orchestrator_external_ip)
         echo "Running real stress test against: http://$STATIC_IP/stress_test"
-        # Since the endpoint blocks for 60s, curl will wait 60s and return success
-        curl -s -X GET "http://$STATIC_IP/stress_test"
-        echo "Stress test triggered! HPA should be scaling up pods now."
+        # Fire 5 concurrent requests to ensure we smash the CPU limit and scale out to 3+ pods
+        for i in {1..5}; do curl -s -X GET "http://$STATIC_IP/stress_test" & done
+        wait
+        echo "Stress test triggered! HPA should be scaling up to at least 3 pods now."
