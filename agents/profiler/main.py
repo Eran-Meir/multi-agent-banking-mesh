@@ -83,7 +83,7 @@ async def get_or_generate_profile(user_id: str) -> Dict[str, Any]:
         session_service = InMemorySessionService()
         session_service.create_session_sync(
             app_name="profiler_app", 
-            session_id=f"session_{user_id}", 
+            session_id=f"session_profiler_{user_id}", 
             user_id=user_id
         )
         

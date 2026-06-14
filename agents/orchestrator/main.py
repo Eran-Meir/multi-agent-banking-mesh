@@ -118,7 +118,7 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         session_service = InMemorySessionService()
         session_service.create_session_sync(
             app_name="orchestrator_app", 
-            session_id=f"session_{user_id}", 
+            session_id=f"session_orchestrator_{user_id}", 
             user_id=user_id
         )
 
