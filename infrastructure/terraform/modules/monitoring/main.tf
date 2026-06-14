@@ -7,49 +7,98 @@ resource "google_monitoring_dashboard" "dashboard" {
     "columns": "2",
     "widgets": [
       {
-        "title": "GKE Pod Count",
+        "title": "Active Pods by Region",
         "xyChart": {
+          "chartOptions": {
+            "mode": "COLOR"
+          },
           "dataSets": [
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/pod/count\" resource.type=\"k8s_cluster\"",
+                  "filter": "metric.type=\"kubernetes.io/pod/uptime\" resource.type=\"k8s_pod\"",
                   "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": [
+                      "resource.label.\"location\""
+                    ],
+                    "perSeriesAligner": "ALIGN_RATE"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "title": "Active Pods by Pod Name (Count)",
+        "xyChart": {
+          "chartOptions": {
+            "mode": "COLOR"
+          },
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"kubernetes.io/pod/uptime\" resource.type=\"k8s_pod\" resource.label.\"namespace_name\"=\"default\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": [
+                      "resource.label.\"pod_name\""
+                    ],
+                    "perSeriesAligner": "ALIGN_RATE"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "title": "CPU Utilization per Pod (cores)",
+        "xyChart": {
+          "chartOptions": {
+            "mode": "COLOR"
+          },
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "crossSeriesReducer": "REDUCE_MEAN",
+                    "groupByFields": [
+                      "resource.label.\"pod_name\""
+                    ],
+                    "perSeriesAligner": "ALIGN_RATE"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "title": "Memory Usage per Pod (bytes)",
+        "xyChart": {
+          "chartOptions": {
+            "mode": "COLOR"
+          },
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"kubernetes.io/container/memory/used_bytes\" resource.type=\"k8s_container\" resource.label.\"namespace_name\"=\"default\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "crossSeriesReducer": "REDUCE_MEAN",
+                    "groupByFields": [
+                      "resource.label.\"pod_name\""
+                    ],
                     "perSeriesAligner": "ALIGN_MEAN"
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
-        "title": "GKE Node CPU Utilization",
-        "xyChart": {
-          "dataSets": [
-            {
-              "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/node/cpu/core_usage_time\" resource.type=\"k8s_node\"",
-                  "aggregation": {
-                    "perSeriesAligner": "ALIGN_RATE"
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
-        "title": "Orchestrator Pod CPU Utilization",
-        "xyChart": {
-          "dataSets": [
-            {
-              "timeSeriesQuery": {
-                "timeSeriesFilter": {
-                  "filter": "metric.type=\"kubernetes.io/container/cpu/core_usage_time\" resource.type=\"k8s_container\" resource.label.\"container_name\"=\"orchestrator\"",
-                  "aggregation": {
-                    "perSeriesAligner": "ALIGN_RATE"
                   }
                 }
               }
