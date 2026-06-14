@@ -2,7 +2,7 @@ resource "google_monitoring_dashboard" "dashboard" {
   project        = var.project_id
   dashboard_json = <<EOF
 {
-  "displayName": "$${var.dashboard_name}",
+  "displayName": "${var.dashboard_name}",
   "gridLayout": {
     "columns": "2",
     "widgets": [
@@ -21,7 +21,7 @@ resource "google_monitoring_dashboard" "dashboard" {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_SUM",
                     "groupByFields": [
-                      "resource.label.\"location\""
+                      "resource.label.location"
                     ],
                     "perSeriesAligner": "ALIGN_RATE"
                   }
@@ -46,7 +46,7 @@ resource "google_monitoring_dashboard" "dashboard" {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_SUM",
                     "groupByFields": [
-                      "resource.label.\"pod_name\""
+                      "resource.label.pod_name"
                     ],
                     "perSeriesAligner": "ALIGN_RATE"
                   }
@@ -71,7 +71,7 @@ resource "google_monitoring_dashboard" "dashboard" {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_MEAN",
                     "groupByFields": [
-                      "resource.label.\"pod_name\""
+                      "resource.label.pod_name"
                     ],
                     "perSeriesAligner": "ALIGN_RATE"
                   }
@@ -96,7 +96,7 @@ resource "google_monitoring_dashboard" "dashboard" {
                     "alignmentPeriod": "60s",
                     "crossSeriesReducer": "REDUCE_MEAN",
                     "groupByFields": [
-                      "resource.label.\"pod_name\""
+                      "resource.label.pod_name"
                     ],
                     "perSeriesAligner": "ALIGN_MEAN"
                   }
