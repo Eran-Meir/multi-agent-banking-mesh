@@ -48,6 +48,7 @@ jobs:
         echo "STATIC_IP=$STATIC_IP" >> $GITHUB_ENV
         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|ENV_PLACEHOLDER|test|g" infrastructure/k8s/orchestrator.yaml
+        sed -i "s|REGION_PLACEHOLDER|me-west1|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|STATIC_IP_PLACEHOLDER|$STATIC_IP|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|MIN_REPLICAS_PLACEHOLDER|1|g" infrastructure/k8s/orchestrator.yaml
         sed -i "s|MAX_REPLICAS_PLACEHOLDER|2|g" infrastructure/k8s/orchestrator.yaml
@@ -58,8 +59,10 @@ jobs:
         echo "Stress Test Endpoint: http://${{ env.STATIC_IP }}/stress_test" >> $GITHUB_STEP_SUMMARY
     - name: App Tester (Integration Test)
       run: |
+        MAX_RETRIES=12
+        RETRY_INTERVAL_SEC=10
         echo "Waiting for Orchestrator to become ready on http://${{ env.STATIC_IP }}/..."
-        for i in {1..12}; do
+        for (( i=1; i<=MAX_RETRIES; i++ )); do
           RESPONSE=$(curl -s -f "http://${{ env.STATIC_IP }}/" || echo "FAIL")
           if [[ "$RESPONSE" != "FAIL" ]]; then
             echo "Response: $RESPONSE"
@@ -68,8 +71,8 @@ jobs:
               exit 0
             fi
           fi
-          echo "Waiting 10s..."
-          sleep 10
+          echo "Waiting ${RETRY_INTERVAL_SEC}s..."
+          sleep $RETRY_INTERVAL_SEC
         done
-        echo "❌ Integration Test Failed! App did not return expected response within 2 minutes."
+        echo "❌ Integration Test Failed! App did not return expected response within allotted time."
         exit 1

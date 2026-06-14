@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.3] - 2026-06-14
+### Changed
+- Enforced strict Coding Guidelines by removing all "magic numbers" (hardcoded loops and load simulations) across the Orchestrator API and GitHub Actions workflows, replacing them with explicit Configuration Constants.
+- Injected the physical Kubernetes datacenter `REGION` directly into the Orchestrator's API response for enhanced multi-region traffic visibility.
+
 ## [v1.0.2] - 2026-06-14
 ### Added
 - Added `pod_id` to the Orchestrator API payload to expose underlying Kubernetes routing metrics.

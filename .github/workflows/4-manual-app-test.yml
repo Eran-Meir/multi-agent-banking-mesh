@@ -52,9 +52,10 @@ jobs:
     - name: Run LoadBalancer Test (Test Env)
       if: inputs.environment == 'test'
       run: |
-        echo "Running 20 requests against Test Environment LoadBalancer ($TEST_IP)..."
+        TOTAL_REQUESTS=20
+        echo "Running ${TOTAL_REQUESTS} requests against Test Environment LoadBalancer ($TEST_IP)..."
         declare -A POD_COUNTS
-        for i in {1..20}; do
+        for (( i=1; i<=TOTAL_REQUESTS; i++ )); do
           POD_ID=$(curl -s "http://$TEST_IP/" | jq -r '.pod_id // "UNKNOWN"')
           echo "Request $i: Handled by $POD_ID"
           POD_COUNTS["$POD_ID"]=$(( ${POD_COUNTS["$POD_ID"]:-0} + 1 ))
@@ -68,9 +69,10 @@ jobs:
     - name: Run LoadBalancer Test (Prod Primary Env)
       if: inputs.environment == 'prod'
       run: |
-        echo "Running 20 requests against Prod Primary LoadBalancer ($PROD_PRI_IP)..."
+        TOTAL_REQUESTS=20
+        echo "Running ${TOTAL_REQUESTS} requests against Prod Primary LoadBalancer ($PROD_PRI_IP)..."
         declare -A POD_COUNTS
-        for i in {1..20}; do
+        for (( i=1; i<=TOTAL_REQUESTS; i++ )); do
           POD_ID=$(curl -s "http://$PROD_PRI_IP/" | jq -r '.pod_id // "UNKNOWN"')
           echo "Request $i: Handled by $POD_ID"
           POD_COUNTS["$POD_ID"]=$(( ${POD_COUNTS["$POD_ID"]:-0} + 1 ))
@@ -84,9 +86,10 @@ jobs:
     - name: Run LoadBalancer Test (Prod Secondary Env)
       if: inputs.environment == 'prod'
       run: |
-        echo "Running 20 requests against Prod Secondary LoadBalancer ($PROD_SEC_IP)..."
+        TOTAL_REQUESTS=20
+        echo "Running ${TOTAL_REQUESTS} requests against Prod Secondary LoadBalancer ($PROD_SEC_IP)..."
         declare -A POD_COUNTS
-        for i in {1..20}; do
+        for (( i=1; i<=TOTAL_REQUESTS; i++ )); do
           POD_ID=$(curl -s "http://$PROD_SEC_IP/" | jq -r '.pod_id // "UNKNOWN"')
           echo "Request $i: Handled by $POD_ID"
           POD_COUNTS["$POD_ID"]=$(( ${POD_COUNTS["$POD_ID"]:-0} + 1 ))
