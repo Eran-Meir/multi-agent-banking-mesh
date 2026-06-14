@@ -101,10 +101,17 @@ async def handle_chat(request: ChatRequest) -> Dict[str, Any]:
         from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService
         from google.genai import types
 
+        session_service = InMemorySessionService()
+        session_service.create_session_sync(
+            app_name="orchestrator_app", 
+            session_id=f"session_{user_id}", 
+            user_id=user_id
+        )
+
         runner = Runner(
             app_name="orchestrator_app",
             agent=orchestrator_agent,
-            session_service=InMemorySessionService(),
+            session_service=session_service,
             artifact_service=InMemoryArtifactService(),
         )
 
