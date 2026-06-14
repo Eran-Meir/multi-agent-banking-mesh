@@ -70,7 +70,7 @@ def get_user_data(user_id: str):
     """Fetch profile from Profiler pod which securely reads from GCS"""
     import requests
     try:
-        resp = requests.get(f"{PROFILER_URL}/profile/{user_id}", timeout=5)
+        resp = requests.get(f"{PROFILER_URL}/profile/{user_id}", timeout=30)
         resp.raise_for_status()
         return resp.json().get("raw_data", {})
     except Exception as e:
