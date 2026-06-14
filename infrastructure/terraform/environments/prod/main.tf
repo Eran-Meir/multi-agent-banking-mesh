@@ -56,6 +56,13 @@ module "artifact_registry" {
   repository_id = "${var.environment}-banking-mesh-repo"
 }
 
+module "storage" {
+  source      = "../../modules/storage"
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+}
+
 module "monitoring" {
   source         = "../../modules/monitoring"
   project_id     = var.project_id
