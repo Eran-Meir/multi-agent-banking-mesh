@@ -49,6 +49,7 @@ resource "google_cloudfunctions2_function" "killswitch" {
     environment_variables = {
       GCP_PROJECT = var.project_id
       GITHUB_REPO = var.github_repo
+      ENVIRONMENT = var.environment
     }
   }
 

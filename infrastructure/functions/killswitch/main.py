@@ -21,8 +21,10 @@ def get_github_token(project_id: str) -> str:
     """
     Retrieves the GitHub Personal Access Token from GCP Secret Manager.
     """
+    environment = os.environ.get('ENVIRONMENT', '')
+    secret_prefix = f"{environment}-" if environment else ""
     client = secretmanager.SecretManagerServiceClient()
-    name = f"projects/{project_id}/secrets/github-pat/versions/latest"
+    name = f"projects/{project_id}/secrets/{secret_prefix}github-pat/versions/latest"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
 
