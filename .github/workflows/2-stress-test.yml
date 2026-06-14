@@ -3,5 +3,24 @@ on: workflow_dispatch
 jobs:
   stress-test:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-    - run: echo "Simulating stress test against Test Environment..." && sleep 5 && echo "Stress test passed. HPA autoscaling verified."
+    - uses: actions/checkout@v4
+    - id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: '${{ vars.WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT_EMAIL }}'
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+    - name: Terraform Init
+      run: terraform init -backend-config="bucket=${{ vars.GCP_TF_STATE_BUCKET }}"
+      working-directory: infrastructure/terraform/environments/test
+    - name: Extract IP and Run Stress Test
+      run: |
+        STATIC_IP=$(terraform -chdir=infrastructure/terraform/environments/test output -raw orchestrator_external_ip)
+        echo "Running real stress test against: http://$STATIC_IP/stress_test"
+        # Since the endpoint blocks for 60s, curl will wait 60s and return success
+        curl -s -X GET "http://$STATIC_IP/stress_test"
+        echo "Stress test triggered! HPA should be scaling up pods now."
