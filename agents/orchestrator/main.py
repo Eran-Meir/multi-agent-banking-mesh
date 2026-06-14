@@ -28,6 +28,10 @@ import os
 if os.path.isdir("frontend"):
     app.mount("/ui", StaticFiles(directory="frontend", html=True), name="frontend")
 
+# Serve the data directory statically so the UI can load it directly
+if os.path.isdir("data"):
+    app.mount("/data", StaticFiles(directory="data"), name="data")
+
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 

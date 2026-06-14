@@ -58,8 +58,8 @@ personaSelect.addEventListener('change', async (e) => {
     orchestratorThoughts.innerHTML = `<span class="placeholder-text">Awaiting input...</span>`;
 
     try {
-        // Fetch live cloud memory from the Orchestrator's new endpoint
-        const response = await fetch(`${ORCHESTRATOR_URL}/user-data/${userId}`);
+        // Fetch the raw JSON directly from the Orchestrator's statically served data folder
+        const response = await fetch(`${ORCHESTRATOR_URL}/data/${userId}.json`);
         if (!response.ok) throw new Error("Could not load data.");
         const data = await response.json();
         
@@ -74,7 +74,7 @@ personaSelect.addEventListener('change', async (e) => {
             profilerCache.innerHTML = `<span class="placeholder-text">No previous session cache found.</span>`;
         }
     } catch (err) {
-        jsonViewer.textContent = "// Error loading live cloud data. " + err.message;
+        jsonViewer.textContent = "// Error loading file. " + err.message;
         profilerCache.innerHTML = `<span class="placeholder-text">Error fetching data.</span>`;
     }
 });
