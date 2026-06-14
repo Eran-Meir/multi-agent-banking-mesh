@@ -71,3 +71,51 @@ spec:
       - type: Percent
         value: 100
         periodSeconds: 15
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: banking-mesh-profiler
+  labels:
+    app: profiler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profiler
+  template:
+    metadata:
+      labels:
+        app: profiler
+    spec:
+      containers:
+      - name: profiler
+        image: IMAGE_PLACEHOLDER
+        args: ["uvicorn", "agents.profiler.main:app", "--host", "0.0.0.0", "--port", "8080"]
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: 100m
+            memory: 512Mi
+        env:
+        - name: ENVIRONMENT
+          value: ENV_PLACEHOLDER
+        - name: REGION
+          value: REGION_PLACEHOLDER
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: profiler-service
+spec:
+  selector:
+    app: profiler
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

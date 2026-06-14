@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADK Banking Mesh - Demo Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Gradients -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="app-container glass">
+        
+        <!-- Header & Mode Toggle -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">🌐</span>
+                <h1>Multi-Agent Banking Mesh <span class="badge">v2.1.0</span></h1>
+            </div>
+            <div class="mode-toggle">
+                <button id="btn-user-mode" class="active">🎭 User Simulation</button>
+                <button id="btn-analyst-mode">📊 Bank Analyst</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- ================= USER SIMULATION MODE ================= -->
+            <div id="view-user-mode" class="view-active">
+                <div class="split-layout">
+                    
+                    <!-- Left Panel: Chat Interface -->
+                    <div class="chat-panel glass-panel">
+                        <div class="panel-header">
+                            <h2>Live Chat</h2>
+                            <div class="status-indicator">
+                                <span class="dot green"></span> Orchestrator Connected
+                            </div>
+                        </div>
+                        <div class="chat-history" id="user-chat-history">
+                            <div class="message system-msg">Please select a Persona to begin the session.</div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="user-chat-input" placeholder="Type your message to the Orchestrator..." disabled>
+                            <button id="user-chat-send" class="btn-primary" disabled>Send</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: ADK Debugger & Persona Selector -->
+                    <div class="debugger-panel glass-panel">
+                        <div class="panel-header">
+                            <h2>ADK Debugger & Context</h2>
+                        </div>
+                        
+                        <div class="persona-section">
+                            <label for="persona-select">Select Persona:</label>
+                            <select id="persona-select">
+                                <option value="" disabled selected>-- Select a User --</option>
+                                <option value="USER_1">USER_1 (The Indebted Divorcee)</option>
+                                <option value="USER_2">USER_2 (The Wealthy Retiree)</option>
+                                <option value="USER_3">USER_3 (The Fresh College Grad)</option>
+                                <option value="USER_4">USER_4 (The Serial Entrepreneur)</option>
+                                <option value="USER_5">USER_5 (The Reckless Spender)</option>
+                            </select>
+                        </div>
+
+                        <div class="data-section">
+                            <h3>🧠 Profiler Memory Cache</h3>
+                            <div class="cache-box" id="profiler-cache">
+                                <span class="placeholder-text">Awaiting selection...</span>
+                            </div>
+
+                            <h3>💰 Latest Transactions</h3>
+                            <pre class="json-viewer" id="json-viewer">// Select a persona to view raw JSON data</pre>
+                            
+                            <h3>🔀 Orchestrator ADK Thoughts</h3>
+                            <div class="thoughts-box" id="orchestrator-thoughts">
+                                <span class="placeholder-text">Send a message to see routing...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= BANK ANALYST MODE ================= -->
+            <div id="view-analyst-mode" class="view-hidden">
+                <div class="analyst-layout glass-panel">
+                    <div class="panel-header">
+                        <h2>Executive Dashboard: Global Trends</h2>
+                        <div class="status-indicator">
+                            <span class="dot blue"></span> Analyst Agent Connected
+                        </div>
+                    </div>
+                    <div class="chat-history" id="analyst-chat-history">
+                        <div class="message system-msg">Welcome, Executive. You can ask me about global banking trends. All user PII has been stripped.</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="analyst-chat-input" placeholder="e.g., What are users asking about today?">
+                        <button id="analyst-chat-send" class="btn-primary">Ask Analyst</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

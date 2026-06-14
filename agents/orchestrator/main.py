@@ -8,10 +8,20 @@ from google.adk import Agent
 # --- Configuration Constants ---
 DEFAULT_AGENT_NAME = "Orchestrator Agent"
 HEALTH_STATUS_OK = "healthy"
-PROFILER_URL = os.environ.get("PROFILER_URL", "http://localhost:8001")
+PROFILER_URL = os.environ.get("PROFILER_URL", "http://profiler-service:8080")
 WEALTH_ADVISOR_URL = os.environ.get("WEALTH_ADVISOR_URL", "http://localhost:8002")
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title=DEFAULT_AGENT_NAME)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 AGENT_NAME = os.environ.get("AGENT_NAME", DEFAULT_AGENT_NAME)
 REGION = os.environ.get("REGION", "unknown-region")
 
@@ -34,6 +44,16 @@ def stress_test(duration: int = 15):
     while time.time() < end_time:
         math.factorial(10000)
     return {"status": "stress test completed", "message": f"CPU spiked for {duration} seconds"}
+
+@app.get("/user-data/{user_id}")
+def get_user_data(user_id: str):
+    """Fetch raw JSON from Profiler pod so UI can read live cloud data"""
+    try:
+        resp = requests.get(f"{PROFILER_URL}/profile/{user_id}")
+        resp.raise_for_status()
+        return resp.json().get("raw_data", {})
+    except Exception as e:
+        return {"error": f"Failed to fetch cloud profile for {user_id}: {e}"}
 
 # Define the ADK Agent for Intent Routing (v2.1.0)
 orchestrator_agent = Agent(
