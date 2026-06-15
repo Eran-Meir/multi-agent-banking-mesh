@@ -180,11 +180,16 @@ During a synthetic traffic flood, the Global Load Balancer actively distributes 
 ![Test Dashboard 1](docs/images/mon_test_dashboard_1.png)
 ![Test Dashboard 2](docs/images/mon_test_dashboard_2.png)
 
-#### Multi-Region Active-Active Production Stress Test
-*Notice the Load Balancer perfectly splitting traffic across `europe-west3` and `europe-west4`, while CPU remains structurally flat due to Gemini API offloading.*
+#### Multi-Region Active-Active Production Baseline
+*Notice the Load Balancer perfectly splitting baseline traffic across `europe-west3` and `europe-west4`, while CPU remains structurally flat due to Gemini API offloading.*
 ![Prod Dashboard 1](docs/images/mon_prod_dashboard_1.png)
 ![Prod Dashboard 2](docs/images/mon_prod_dashboard_2.png)
 ![Dashboards List](docs/images/mon_dashboards_list.png)
+
+#### Multi-Region Autoscaling Spike (HPA Engaged)
+*During a simulated surge of global traffic, the Horizontal Pod Autoscalers (HPA) instantly intercept the load. The graphs below clearly illustrate the `europe-west4` Orchestrator scaling up to 4 concurrent replicas, and `europe-west3` scaling to 3 replicas, seamlessly absorbing the spike with zero downtime or CPU saturation.*
+![Prod Stress 1](docs/images/mon_prod_stress_1.png)
+![Prod Stress 2](docs/images/mon_prod_stress_2.png)
 
 ### 5. Model Selection & API Economics
 Because this platform scales globally, selecting the correct foundational AI model is critical to maintaining zero-cost operations during development. 
