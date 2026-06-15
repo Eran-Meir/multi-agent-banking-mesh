@@ -125,3 +125,29 @@ The **Profiler** and **Expense Analyst** agents use *Agentic Inference* to deduc
 - **Detecting Fraud:** If a 55-year-old user exhibits years of normal suburban grocery spending, but suddenly executes two transactions in Moscow for $8,400 in luxury jewelry, the AI instantly deduces a geographic and behavioral anomaly and triggers a Card Lock protocol. 
 
 The intelligence emerges dynamically from the raw ledger.
+
+---
+
+## 📸 Live Platform Demonstrations
+
+The true power of the Multi-Agent Mesh is how it dynamically routes and adapts its advice based on the deep psychological profiling of the user. Below are live executions from the platform demonstrating the routing, the agent logic, and the real-time cross-pod executive dashboard.
+
+### 1. The Wealth Advisor: Protective Intervention (Sarah)
+Sarah is flagged by the Profiler as a high-risk individual with significant credit card debt. Even though she explicitly asks to buy speculative SpaceX stock, the Wealth Advisor **refuses** to provide investment strategies, actively blocking the high-risk action and pivoting the conversation to debt management.
+![Sarah SpaceX Request](docs/images/demo_sarah_spacex.png)
+
+### 2. The Wealth Advisor: Strategic Enablement (Arthur)
+Arthur, a wealthy tech entrepreneur with massive liquid capital, asks the exact same question as Sarah. Because the Profiler recognizes his aggressive growth profile and high risk tolerance, the Wealth Advisor provides a highly detailed, strategic breakdown of secondary market private equity risks for SpaceX.
+![Arthur SpaceX Request](docs/images/demo_arthur_spacex.png)
+
+### 3. The Wealth Advisor: Fraud & Risk Detection (Marcus)
+Marcus, who normally has a conservative profile, asks to buy a $2,500 luxury ring to "flip" for profit. The Orchestrator intercepts the interaction and identifies recent anomalous transactions in Moscow. The Wealth Advisor immediately shuts down the speculative purchase, flagging the behavior as high-risk and advising the user to secure their account.
+![Marcus Ring Request](docs/images/demo_marcus_ring.png)
+
+### 4. The Expense Analyst: Incident Response (Marcus)
+Following the anomalous transactions, Marcus asks for an expense analysis. The Orchestrator perfectly routes this intent to the **Expense Analyst** pod. The Expense Analyst declares the account compromised, enforces a Security Lock protocol, and completely halts normal budgeting advice until the fraud is resolved.
+![Marcus Expense Analyst](docs/images/demo_marcus_expense.png)
+
+### 5. Executive Bank Analyst: Cross-Pod Global Insights
+The Executive Bank Analyst is a specialized agent that sits above all user pods. By querying the `global_trends.json` file (which is actively fed by the Orchestrator's summarization agent), the Executive Analyst can answer high-level questions about what all users are asking across the entire platform in real-time. Here, it correctly identifies the sudden surge of interest in SpaceX stock and summarizes the Wealth Advisors' protective interventions.
+![Executive Bank Analyst](docs/images/demo_bank_analyst.png)
