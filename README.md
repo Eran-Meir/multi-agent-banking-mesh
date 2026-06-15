@@ -3,9 +3,11 @@
 ![Deploy to Test](https://github.com/Eran-Meir/multi-agent-banking-mesh/actions/workflows/1-deploy-to-test.yml/badge.svg)
 ![Release to Prod](https://github.com/Eran-Meir/multi-agent-banking-mesh/actions/workflows/3-release-to-prod.yml/badge.svg)
 
-This repository contains an enterprise-grade, cloud-native **Multi-Agent Banking System** designed for high-security deployment on Google Kubernetes Engine (GKE) Autopilot. 
-
-Rather than a monolithic AI script, this system implements a highly decoupled **Microservice AI Topology**. It is designed specifically for financial institutions, featuring extreme scalability, isolated personality modules, and strict compliance guardrails.
+> [!NOTE] 
+> **Executive Summary & Repository Description**  
+> This repository contains an **Enterprise-grade, Active-Active Serverless AI Banking Mesh**. Rather than relying on a massive, monolithic AI script, this system implements a highly decoupled **Microservice AI Topology**. It features **6 specialized Gemini-powered AI Agents** responsible for financial profiling, semantic intent routing, memory compression, and expense anomaly detection. 
+> 
+> The entire mesh is designed for high-security, Zero-Trust deployment across a horizontally scalable Google Kubernetes Engine (GKE) Autopilot cluster, achieving extreme throughput with negligible compute overhead (FinOps optimized).
 
 ---
 
