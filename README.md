@@ -3,10 +3,12 @@
 ![Deploy to Test](https://github.com/Eran-Meir/multi-agent-banking-mesh/actions/workflows/1-deploy-to-test.yml/badge.svg)
 ![Release to Prod](https://github.com/Eran-Meir/multi-agent-banking-mesh/actions/workflows/3-release-to-prod.yml/badge.svg)
 <br>
+![Google ADK](https://img.shields.io/badge/Google%20ADK-%234285F4.svg?logo=google&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-%238E75B2.svg?logo=google&logoColor=white)
+![AI Agents](https://img.shields.io/badge/AI%20Agents-%23FF9900.svg?logo=probot&logoColor=white)
 ![Google Cloud](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?logo=google-cloud&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?logo=kubernetes&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?logo=terraform&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini-%238E75B2.svg?logo=google&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)
 ![Python](https://img.shields.io/badge/python-3670A0?logo=python&logoColor=ffdd54)
 
