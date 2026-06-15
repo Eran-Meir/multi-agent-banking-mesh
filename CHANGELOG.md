@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0] - 2026-06-15
+### Added
+- **Final Project Billing & FinOps Audit**: Added massive documentation on our $0.00 infrastructure bill, emphasizing the "Serverless AI Paradox" where intense model inferencing uses almost zero GKE Autopilot CPU overhead by offloading to Gemini endpoints.
+- **Automated Zero-Billing Killswitch**: Improved the GCP Cloud Function killswitch logic to hook perfectly into the GitHub Actions API. It now listens to the Pub/Sub topic and automatically dispatches the `6-destroy-all-and-verify` workflow.
+- **Executive Summary UI**: Enhanced the `README.md` repository design with an enterprise Executive Summary blockquote and streamlined the vertical spacing of the entire document for optimal readability.
+### Changed
+- Disabled "on push" automatic deployments to Test to prevent unintentional resource provisioning during documentation commits, enforcing manual triggers for all infrastructure deployment workflows.
+- Adjusted the killswitch safety back to strictly honor the `budget_amount` threshold instead of triggering indiscriminately.
+
 ## [v2.2.0] - 2026-06-15
 ### Added
 - **Persistent User Memory**: The Orchestrator now intercepts chat interaction summaries and persists them to Google Cloud Storage. The Profiler dynamically reads these `past_interactions` to inject multi-session awareness into the user's psychological profile.

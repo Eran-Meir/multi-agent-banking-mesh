@@ -50,13 +50,7 @@ The Wealth Advisor does not guess the bank's internal mortgage rates.
 * The GKE Autopilot cluster is entirely private. 
 * We use **VPC Service Controls (VPC-SC)** to draw a secure perimeter around the GCP project. Even with compromised service account keys, data cannot be exfiltrated outside the corporate network.
 
----
 
-## 💥 The Zero-Billing Killswitch
-
-To ensure strict cost control during development, this repository implements a fully automated **Billing Killswitch**. 
-
-A GCP Budget is wired to a Pub/Sub topic. If infrastructure costs exceed the **$9.00 USD** threshold, an event-driven Gen 2 Cloud Function automatically intercepts the billing alert and fires a payload to GitHub Actions. This immediately triggers the `6. Nuke Everything` pipeline, aggressively destroying all Terraform infrastructure and terminating the project to guarantee a strict $0/month baseline.
 
 ---
 
@@ -240,14 +234,15 @@ To overcome this bottleneck without attaching a corporate billing account, the e
 
 ![Gemini API Rate Limit](docs/images/api_rate_limit.png)
 
----
+### 6. The Automated Zero-Billing Killswitch
 
-## 🛑 The Zero-Billing Killswitch
-To ensure absolute zero-billing when the platform is not actively being developed or tested, we provide an automated "nuke" approach. 
+To ensure absolute zero-billing when the platform is not actively being developed or tested, we provide a fully automated **Billing Killswitch**. 
 
-We have deployed a Google Cloud Function that listens to GCP Billing Budget Alerts. If the project exceeds a hardcoded budget (e.g., $9.00), the function instantly reaches out to GitHub via an injected PAT (Personal Access Token) and triggers the **`6-destroy-all-and-verify.yml`** workflow, effectively executing `terraform destroy` across both `prod` and `test` environments.
+A GCP Budget is wired to a Pub/Sub topic. If the project exceeds a hardcoded budget threshold (e.g., $9.00 USD), an event-driven Gen 2 Cloud Function instantly intercepts the billing alert. It then reaches out to the GitHub Actions API via an injected PAT (Personal Access Token) and triggers the **`6-destroy-all-and-verify.yml`** workflow. 
 
-To manually trigger this automated defense mechanism by simulating a $10.00 budget breach, run this one-liner:
+This aggressively executes `terraform destroy` across both `prod` and `test` environments simultaneously, terminating the project to guarantee a strict $0/month baseline.
+
+To manually trigger this automated defense mechanism by simulating a $10.00 budget breach, run this one-liner in Cloud Shell:
 ```bash
 gcloud pubsub topics publish prod-billing-alerts-topic --message='{"costAmount":10.00, "budgetAmount":9.00}'
 ```
