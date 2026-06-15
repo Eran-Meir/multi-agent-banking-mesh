@@ -11,6 +11,25 @@
 
 ---
 
+## 🛠️ Technology Stack
+
+This platform aggressively utilizes modern Cloud-Native and Serverless AI technologies:
+
+### AI & Agentic Frameworks
+* **Google Agent Development Kit (ADK 2.0):** Used for building the Multi-Agent graph, intent routing, and psychological agentic inference.
+* **Gemini 3.1 Flash-Lite:** The foundational LLM powering all 6 agents, strategically chosen for its massive 500 Requests-Per-Day free tier allowance.
+* **Semantic Storage (JSON-Sharding):** Dynamic, localized file-based state compression used by the Profiler Agent to maintain cross-session memory with zero database footprint.
+
+### Cloud Infrastructure & DevOps
+* **Google Kubernetes Engine (GKE) Autopilot:** Serverless Kubernetes infrastructure enabling true zero-ops node provisioning and independent Horizontal Pod Autoscaling (HPA) for each agent.
+* **Terraform:** Complete Infrastructure-as-Code (IaC) configuration for one-click multi-region Active-Active deployments.
+* **GitHub Actions (OIDC):** Automated CI/CD pipelines integrating Workload Identity Federation for keyless, Zero-Trust deployment to GCP.
+* **Google Cloud Load Balancing:** Cross-region traffic routing and active failure mitigation between `europe-west4` and `europe-west3`.
+* **GCP Pub/Sub & Cloud Functions (Gen 2):** Event-driven asynchronous messaging for the automated "Zero-Billing Killswitch" and background FinOps analytics.
+* **Google Artifact Registry:** Container storage secured by an automated Terraform cleanup policy to strictly retain only the 4 most recent deployments.
+
+---
+
 ## 🏗️ The Multi-Agent Microservice Topology
 
 The system uses a highly scalable "Traffic Cop" routing pattern to ensure AI requests are handled efficiently and independently.
