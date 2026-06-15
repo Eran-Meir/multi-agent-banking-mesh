@@ -205,9 +205,15 @@ Storing thousands of multi-turn AI interactions per user in a database quickly b
 We strictly separate our computing power to save money:
 * **Test Environment (me-west1):** Runs on a single, isolated regional load balancer with highly capped Horizontal Pod Autoscalers (HPA). It is designed to be cheap and disposable.
 * **Production Environment (europe-west4 / europe-west3):** A massive, multi-region Active-Active cluster with aggressive HPA limits, ready to absorb global financial traffic.
-* **The CI/CD Flow:** We rely on GitHub Actions to traverse these environments. Code is merged, tested, and deployed to Test. Only after the `App Tester` verifies the mesh routing does the user manually trigger the `3. Release to Prod` pipeline.
 
-### 4. Stress Testing & HPA Autoscaling
+### 4. CI/CD, Automated Testing & Artifact FinOps
+We rely on GitHub Actions to traverse these environments securely:
+1. **Auto-Deploy to Test:** Deployments are triggered to the disposable `test` environment. 
+2. **App Tester Validation:** The pipeline strictly enforces an automated integration `App Tester`. It queries the newly deployed Regional Load Balancers, ensuring they return HTTP 200 OK and expected API payloads before considering the deployment successful.
+3. **Release to Prod (Git Tagging):** Only after Test passes does the team manually trigger the `3. Release to Prod` pipeline. Upon a successful Active-Active deployment, the workflow automatically reads the `VERSION` file, generates a formal **Git Tag** (e.g., `v3.0.0`), and pushes the release to the repository history.
+4. **Artifact Cleanup Policy:** To prevent Docker Images from silently eating into our Cloud Storage budget over time, we enforce a strict Google Artifact Registry Cleanup Policy via Terraform. It automatically deletes untagged, stale container images and strictly caps the registry to only keep the **4 most recent deployments**.
+
+### 5. Stress Testing & HPA Autoscaling
 During a synthetic traffic flood, the Global Load Balancer actively distributes the request load across both European regions. As the concurrent connections spike, the **Horizontal Pod Autoscalers (HPA)** immediately spin up additional Orchestrator and Profiler replicas to absorb the impact, which are then gracefully destroyed when the traffic subsides.
 
 #### Test Environment Baseline
@@ -225,7 +231,7 @@ During a synthetic traffic flood, the Global Load Balancer actively distributes 
 ![Prod Stress 1](docs/images/mon_prod_stress_1.png)
 ![Prod Stress 2](docs/images/mon_prod_stress_2.png)
 
-### 5. Model Selection & API Economics
+### 6. Model Selection & API Economics
 Because this platform scales globally, selecting the correct foundational AI model is critical to maintaining zero-cost operations during development. 
 
 Initially, the Orchestrator utilized `gemini-2.5-flash`, which is an incredibly capable model but imposes a strict Free Tier limitation of **20 Requests Per Day (RPD)**. Under stress-testing, this caused API exhaustion blocks. 
@@ -234,7 +240,7 @@ To overcome this bottleneck without attaching a corporate billing account, the e
 
 ![Gemini API Rate Limit](docs/images/api_rate_limit.png)
 
-### 6. The Automated Zero-Billing Killswitch
+### 7. The Automated Zero-Billing Killswitch
 
 To ensure absolute zero-billing when the platform is not actively being developed or tested, we provide a fully automated **Billing Killswitch**. 
 
