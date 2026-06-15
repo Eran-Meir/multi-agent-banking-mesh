@@ -79,7 +79,7 @@ def get_user_data(user_id: str):
 # Define the ADK Agent for Intent Routing (v2.1.0)
 orchestrator_agent = Agent(
     name="orchestrator_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     instruction="""
     Determine the intent of the following user message. 
     Is the user asking for 'Wealth Advice' (investments, stocks) or 'Expense Analysis' (budgeting, transactions, debt)?
@@ -90,7 +90,7 @@ orchestrator_agent = Agent(
 # Downstream Agent: Wealth Advisor
 wealth_advisor_agent = Agent(
     name="wealth_advisor_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     instruction="""
     You are a professional Wealth Advisor. You must answer the user's question based strictly on their AI Profile summary provided below.
     If they have high debt and low savings, discourage risky investments.
@@ -101,7 +101,7 @@ wealth_advisor_agent = Agent(
 # Downstream Agent: Expense Analyst
 expense_analyst_agent = Agent(
     name="expense_analyst_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     instruction="""
     You are a strict Expense Analyst. Analyze the user's question based strictly on their AI Profile summary provided below.
     Focus on budgeting, debt reduction, and transaction management.
@@ -112,7 +112,7 @@ expense_analyst_agent = Agent(
 # Define the ADK Agent for Conversation Memory Summarization (Phase 6)
 summarizer_agent = Agent(
     name="summarizer_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     instruction="""
     Summarize the recent interaction between the user and the system in 1-2 sentences. 
     Keep it extremely concise. Example: "The user asked about Tesla stock options and was routed to the Wealth Advisor."
@@ -122,7 +122,7 @@ summarizer_agent = Agent(
 # Define the ADK Agent for the Bank Analyst (Executive Dashboard)
 bank_analyst_agent = Agent(
     name="bank_analyst_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     instruction="""
     You are the Executive Bank Analyst AI. You are providing insights to the bank's executives.
     Analyze the provided global_trends.json data, which contains the recent chat summaries across all users.

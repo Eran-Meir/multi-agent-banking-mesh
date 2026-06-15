@@ -31,7 +31,7 @@ except Exception as e:
 # --- Define Profiler Agent ---
 profiler_agent = Agent(
     name="profiler_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     instruction="""
     You are a highly analytical core banking Profiler Agent.
     Analyze the provided raw transaction, demographic data, and especially the past_interactions array.

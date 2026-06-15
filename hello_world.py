@@ -15,7 +15,7 @@ async def main():
     # 1. Define the Agent
     hello_agent = Agent(
         name="hello_agent",
-        model="gemini-2.5-flash",
+        model="gemini-3.1-flash-lite",
         instruction="You are a friendly assistant. Keep your answers brief and start with 'Hello World!'"
     )
 
@@ -34,7 +34,7 @@ async def main():
         session_service=session_service
     )
 
-    print("\nSending prompt 'Hello World' to Gemini 2.5 Flash...")
+    print("\nSending prompt 'Hello World' to Gemini 3.1 Flash Lite...")
     print("--------------------------------------------------")
     
     # 4. Run the inference
