@@ -186,3 +186,11 @@ During a synthetic traffic flood, the Global Load Balancer actively distributes 
 ![Prod Dashboard 2](docs/images/mon_prod_dashboard_2.png)
 ![Dashboards List](docs/images/mon_dashboards_list.png)
 
+### 5. Model Selection & API Economics
+Because this platform scales globally, selecting the correct foundational AI model is critical to maintaining zero-cost operations during development. 
+
+Initially, the Orchestrator utilized `gemini-2.5-flash`, which is an incredibly capable model but imposes a strict Free Tier limitation of **20 Requests Per Day (RPD)**. Under stress-testing, this caused API exhaustion blocks. 
+
+To overcome this bottleneck without attaching a corporate billing account, the entire mesh was seamlessly migrated to **`gemini-3.1-flash-lite`**. This strategic downgrade trades a microscopic fraction of reasoning capacity for a massive **500 Requests Per Day (RPD)** allowance. This ensures the mesh stays fully operational and free-tier compliant, even during rigorous load testing.
+
+![Gemini API Rate Limit](docs/images/api_rate_limit.png)
