@@ -239,15 +239,16 @@ To overcome this bottleneck without attaching a corporate billing account, the e
 ---
 
 ## 🛑 The Zero-Billing Killswitch
-To ensure absolute zero-billing when the platform is not actively being developed or tested, we provide a "nuke" approach that instantly destroys all provisioned GCP infrastructure. 
+To ensure absolute zero-billing when the platform is not actively being developed or tested, we provide an automated "nuke" approach. 
 
-To completely delete the project and all associated billing:
+We have deployed a Google Cloud Function that listens to GCP Billing Budget Alerts. If the project exceeds a hardcoded budget (e.g., $9.00), the function instantly reaches out to GitHub via an injected PAT (Personal Access Token) and triggers the **`6-destroy-all-and-verify.yml`** workflow, effectively executing `terraform destroy` across both `prod` and `test` environments.
+
+To manually trigger this automated defense mechanism by simulating a $10.00 budget breach, run this one-liner:
 ```bash
-gcloud projects delete [YOUR_PROJECT_ID] --quiet
+gcloud pubsub topics publish prod-billing-alerts-topic --message='{"costAmount":10.00, "budgetAmount":9.00}'
 ```
 
-Alternatively, to retain the Project shell but destroy all Terraformed infrastructure, you can manually trigger the **`6-destroy-all-and-verify.yml`** GitHub Action pipeline, or run:
+If you prefer to bypass the Cloud Function and completely obliterate the entire GCP Project shell along with all associated billing accounts manually, you can run:
 ```bash
-terraform -chdir=infrastructure/terraform/environments/prod destroy -auto-approve
-terraform -chdir=infrastructure/terraform/environments/test destroy -auto-approve
+gcloud projects delete [YOUR_PROJECT_ID] --quiet
 ```
