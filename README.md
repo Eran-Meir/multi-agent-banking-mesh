@@ -3,6 +3,7 @@
 ![Deploy to Test](https://github.com/Eran-Meir/multi-agent-banking-mesh/actions/workflows/1-deploy-to-test.yml/badge.svg)
 ![Release to Prod](https://github.com/Eran-Meir/multi-agent-banking-mesh/actions/workflows/3-release-to-prod.yml/badge.svg)
 <br>
+![Google AntiGravity](https://img.shields.io/badge/Google%20AntiGravity-%231A73E8.svg?logo=google&logoColor=white)
 ![Google ADK](https://img.shields.io/badge/Google%20ADK-%234285F4.svg?logo=google&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Gemini-%238E75B2.svg?logo=google&logoColor=white)
 ![AI Agents](https://img.shields.io/badge/AI%20Agents-%23FF9900.svg?logo=probot&logoColor=white)
@@ -25,6 +26,7 @@
 This platform aggressively utilizes modern Cloud-Native and Serverless AI technologies:
 
 ### AI & Agentic Frameworks
+* **Google AntiGravity:** Advanced Agentic AI Pair Programmer utilized to jointly architect, debug, and rapidly deploy the entire multi-region Kubernetes infrastructure and Python microservice logic.
 * **Google Agent Development Kit (ADK 2.0):** Used for building the Multi-Agent graph, intent routing, and psychological agentic inference.
 * **Gemini 3.1 Flash-Lite:** The foundational LLM powering all 6 agents, strategically chosen for its massive 500 Requests-Per-Day free tier allowance.
 * **Semantic Storage (JSON-Sharding):** Dynamic, localized file-based state compression used by the Profiler Agent to maintain cross-session memory with zero database footprint.
