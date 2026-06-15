@@ -192,7 +192,9 @@ The Executive Bank Analyst is a specialized agent that sits above all user pods.
 
 ## 📈 FinOps, Monitoring & Elastic Scalability
 
-A primary objective of this architecture is maximizing AI scale while aggressively crushing compute and storage costs.
+A primary objective of this architecture is maximizing AI scale while aggressively crushing compute and storage costs. As a testament to this architecture, the total bill for developing, provisioning, stress-testing, and running this entire Enterprise Multi-Agent Banking Mesh was precisely **$0.00** (6.54 NIS, fully covered by free tiers and optimizations).
+
+![Total Project Cost](docs/images/total_cost.png)
 
 ### 1. The Serverless AI Paradox (Where is the CPU?)
 If you look at the stress-test monitoring graphs below, you'll notice a glaring anomaly: **the AI Agent Pods use almost zero CPU (0.002 to 0.012 cores)** even while processing thousands of complex financial analyses.
