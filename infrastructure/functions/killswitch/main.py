@@ -44,8 +44,8 @@ def killswitch(event: Dict[str, Any], context: Any) -> None:
         
         print(f"Received billing alert. Cost: {cost_amount} {currency_code}, Budget Limit: {budget_amount} {currency_code}")
         
-        if cost_amount >= budget_amount:
-            print(f"BUDGET EXCEEDED ({cost_amount} >= {budget_amount} {currency_code})! Initiating automated killswitch.")
+        if cost_amount > 0:
+            print(f"COST DETECTED ({cost_amount} > 0 {currency_code})! Initiating automated killswitch.")
             
             project_id = os.environ.get('GCP_PROJECT')
             if not project_id:
