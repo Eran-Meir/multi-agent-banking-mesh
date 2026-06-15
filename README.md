@@ -247,8 +247,3 @@ To manually trigger this automated defense mechanism by simulating a $10.00 budg
 ```bash
 gcloud pubsub topics publish prod-billing-alerts-topic --message='{"costAmount":10.00, "budgetAmount":9.00}'
 ```
-
-If you prefer to bypass the Cloud Function and completely obliterate the entire GCP Project shell along with all associated billing accounts manually, you can run:
-```bash
-gcloud projects delete [YOUR_PROJECT_ID] --quiet
-```
