@@ -151,3 +151,38 @@ Following the anomalous transactions, Marcus asks for an expense analysis. The O
 ### 5. Executive Bank Analyst: Cross-Pod Global Insights
 The Executive Bank Analyst is a specialized agent that sits above all user pods. By querying the `global_trends.json` file (which is actively fed by the Orchestrator's summarization agent), the Executive Analyst can answer high-level questions about what all users are asking across the entire platform in real-time. Here, it correctly identifies the sudden surge of interest in SpaceX stock and summarizes the Wealth Advisors' protective interventions.
 ![Executive Bank Analyst](docs/images/demo_bank_analyst.png)
+
+---
+
+## 📈 FinOps, Monitoring & Elastic Scalability
+
+A primary objective of this architecture is maximizing AI scale while aggressively crushing compute and storage costs.
+
+### 1. The Serverless AI Paradox (Where is the CPU?)
+If you look at the stress-test monitoring graphs below, you'll notice a glaring anomaly: **the AI Agent Pods use almost zero CPU (0.002 to 0.012 cores)** even while processing thousands of complex financial analyses.
+
+**How?** Because the Kubernetes cluster is *not* executing the LLM weights. 
+All of the massive Tensor matrix multiplication and deep learning heavy lifting is completely offloaded to Google's Vertex AI / Gemini API via the `google-adk`. The Kubernetes pods are merely lightweight API Gateways that assemble context, make asynchronous HTTP calls to Google's supercomputers, and route the resulting JSON. This allows us to handle enterprise-grade AI scale using cheap, ultra-low CPU pod configurations.
+
+### 2. Semantic Storage Compression
+Storing thousands of multi-turn AI interactions per user in a database quickly becomes exorbitantly expensive. Instead, our Profiler implements **Semantic Compression**. Rather than saving raw conversational logs, the ADK Summarizer agent compresses the entire interaction into a tiny 1-2 sentence JSON blob. This maintains the user's historical context for future sessions while keeping the storage payload infinitesimally small.
+
+### 3. Asymmetric Environment Pipelines
+We strictly separate our computing power to save money:
+* **Test Environment (me-west1):** Runs on a single, isolated regional load balancer with highly capped Horizontal Pod Autoscalers (HPA). It is designed to be cheap and disposable.
+* **Production Environment (europe-west4 / europe-west3):** A massive, multi-region Active-Active cluster with aggressive HPA limits, ready to absorb global financial traffic.
+* **The CI/CD Flow:** We rely on GitHub Actions to traverse these environments. Code is merged, tested, and deployed to Test. Only after the `App Tester` verifies the mesh routing does the user manually trigger the `3. Release to Prod` pipeline.
+
+### 4. Stress Testing & HPA Autoscaling
+During a synthetic traffic flood, the Global Load Balancer actively distributes the request load across both European regions. As the concurrent connections spike, the **Horizontal Pod Autoscalers (HPA)** immediately spin up additional Orchestrator and Profiler replicas to absorb the impact, which are then gracefully destroyed when the traffic subsides.
+
+#### Test Environment Baseline
+![Test Dashboard 1](docs/images/mon_test_dashboard_1.png)
+![Test Dashboard 2](docs/images/mon_test_dashboard_2.png)
+
+#### Multi-Region Active-Active Production Stress Test
+*Notice the Load Balancer perfectly splitting traffic across `europe-west3` and `europe-west4`, while CPU remains structurally flat due to Gemini API offloading.*
+![Prod Dashboard 1](docs/images/mon_prod_dashboard_1.png)
+![Prod Dashboard 2](docs/images/mon_prod_dashboard_2.png)
+![Dashboards List](docs/images/mon_dashboards_list.png)
+
