@@ -15,7 +15,7 @@
 
 > [!NOTE] 
 > **Executive Summary & Repository Description**  
-> This repository contains an **Enterprise-grade, Active-Active Serverless AI Banking Mesh**. Rather than relying on a massive, monolithic AI script, this system implements a highly decoupled **Microservice AI Topology**. It features **6 specialized Gemini-powered AI Agents** responsible for financial profiling, semantic intent routing, memory compression, and expense anomaly detection. 
+> This repository contains an **Enterprise-grade, Active-Active Serverless AI Banking Mesh**. Rather than relying on a massive, monolithic AI script, this system implements a highly decoupled **Microservice AI Topology**. It features **4 specialized Gemini-powered AI Agents** responsible for financial profiling, semantic intent routing, memory compression, and expense anomaly detection. 
 > 
 > The entire mesh is designed for high-security, Zero-Trust deployment across a horizontally scalable Google Kubernetes Engine (GKE) Autopilot cluster, achieving extreme throughput with negligible compute overhead (FinOps optimized).
 
@@ -28,7 +28,7 @@ This platform aggressively utilizes modern Cloud-Native and Serverless AI techno
 ### AI & Agentic Frameworks
 * **Google AntiGravity:** Advanced Agentic AI Pair Programmer utilized to jointly architect, debug, and rapidly deploy the entire multi-region Kubernetes infrastructure and Python microservice logic.
 * **Google Agent Development Kit (ADK 2.0):** Used for building the Multi-Agent graph, intent routing, and psychological agentic inference.
-* **Gemini 3.1 Flash-Lite:** The foundational LLM powering all 6 agents, strategically chosen for its massive 500 Requests-Per-Day free tier allowance.
+* **Gemini 3.1 Flash-Lite:** The foundational LLM powering all 4 agents, strategically chosen for its massive 500 Requests-Per-Day free tier allowance.
 * **Semantic Storage (JSON-Sharding):** Dynamic, localized file-based state compression used by the Profiler Agent to maintain cross-session memory with zero database footprint.
 
 ### Cloud Infrastructure & DevOps
@@ -49,7 +49,6 @@ The system uses a highly scalable "Traffic Cop" routing pattern to ensure AI req
 2. **The Profiler Agent (Memory Engine):** Analyzes and stores user context, spending behaviors, and investment risk tolerance. It also tracks **Persistent User Memory**, retaining a historical understanding of past interactions across sessions.
 3. **The Expense Analyst Agent:** Securely crunches heavy datasets (e.g., thousands of bank transactions) via asynchronous GCP Pub/Sub queues to detect spending anomalies.
 4. **The Wealth Advisor Agent:** Consumes data from the Profiler and Expense Analyst to generate personalized, risk-adjusted investment insights.
-5. **The Executive Bank Analyst Agent:** A cross-pod global intelligence module that aggregates `global_trends.json` data to answer high-level executive questions about overall platform traffic and user intents in real-time.
 
 > **💡 Why Microservices?** Each agent is a separate Kubernetes `Deployment` with its own `HorizontalPodAutoscaler` (HPA). If 10,000 users suddenly ask for stock advice, the Wealth Advisor scales from 1 to 50 pods instantly, while the Expense Analyst stays at 1 pod. They scale completely independently based on real-time traffic.
 
@@ -140,7 +139,7 @@ graph TD
 
 ---
 
-## 🤖 The 6 Specialized AI Personas
+## 🤖 The 4 Specialized AI Personas
 
 The entire "Multi-Agent" aspect of this mesh relies heavily on highly specialized System Prompts tailored for each specific agent pod. They are tightly constrained to their exact roles in the banking ecosystem:
 
@@ -163,16 +162,6 @@ The entire "Multi-Agent" aspect of this mesh relies heavily on highly specialize
 * **Specialty**: Budgeting & Debt Reduction.
 * **System Prompt**: *"You are a strict Expense Analyst. Analyze the user's question based strictly on their AI Profile summary provided below. Focus on budgeting, debt reduction, and transaction management. Be concise, practical, and highly personalized."*
 * **Why**: It acts as the strict financial planner. It doesn't care about stocks; it only cares about balancing the ledger and spotting anomalies.
-
-### 5. The Summarizer Agent
-* **Specialty**: Storage FinOps & Memory Compression.
-* **System Prompt**: *"Summarize the recent interaction between the user and the system in 1-2 sentences. Keep it extremely concise."*
-* **Why**: It runs asynchronously in the background after every chat, replacing the massive chat log with a tiny summary to save Google Cloud Storage space.
-
-### 6. The Executive Bank Analyst Agent
-* **Specialty**: Global Cross-Pod Trends.
-* **System Prompt**: *"You are the Executive Bank Analyst AI. You are providing insights to the bank's executives. Analyze the provided global_trends.json data... Answer the executive's question based strictly on this trend data."*
-* **Why**: It sits above all the user pods and is the only agent that has access to the aggregated trends of the entire banking population.
 
 ---
 

@@ -5,8 +5,4 @@ variable "region" {
 }
 variable "environment" { type = string }
 
-variable "billing_account_id" {
-  type        = string
-  default     = "014236-1449C2-E83270"
-  description = "Billing Account ID for alerts"
-}
+

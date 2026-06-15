@@ -4,3 +4,5 @@ variable "region" {
   default = "europe-west4"
 }
 variable "environment" { type = string }
+
+

@@ -26,10 +26,9 @@ module "monitoring" {
 }
 
 module "billing" {
-  source             = "../../modules/billing"
-  project_id         = var.project_id
-  environment        = var.environment
-  billing_account_id = "014236-1449C2-E83270"
+  source      = "../../modules/billing"
+  project_id  = var.project_id
+  environment = var.environment
 }
 
 module "killswitch" {

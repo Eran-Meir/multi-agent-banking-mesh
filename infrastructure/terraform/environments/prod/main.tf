@@ -34,11 +34,9 @@ module "gke_secondary" {
 }
 
 module "billing" {
-  source             = "../../modules/billing"
-  project_id         = var.project_id
-  environment        = var.environment
-  # Note: You need a billing account ID for prod, using a dummy or ignoring budget for prod if not specified
-  billing_account_id = "014236-1449C2-E83270"
+  source      = "../../modules/billing"
+  project_id  = var.project_id
+  environment = var.environment
 }
 
 module "killswitch" {
