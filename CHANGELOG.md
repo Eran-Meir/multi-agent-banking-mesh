@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.2.0] - 2026-06-15
+### Added
+- **Persistent User Memory**: The Orchestrator now intercepts chat interaction summaries and persists them to Google Cloud Storage. The Profiler dynamically reads these `past_interactions` to inject multi-session awareness into the user's psychological profile.
+- **Executive Bank Analyst Endpoint**: Added `/analyst/chat` endpoint to query an aggregated `global_trends.json` database. The Bank Analyst AI dynamically answers high-level metric questions based on live, cross-pod platform traffic.
+### Changed
+- **Zero-Downtime Deployment Architecture**: Enforced strict `RollingUpdate` strategies (`maxUnavailable: 0`) and robust HTTP Readiness and Liveness Probes across all Kubernetes Deployments.
+- **Smart Profiler Caching**: Engineered a fast-path cache mechanism. The Profiler dynamically invalidates and regenerates its deep Agentic Inference evaluations if the user exceeds 5 interactions or if the cache is older than 30 days.
+- Swapped all ADK Agents across Orchestrator and Profiler to `gemini-3.1-flash-lite` to capitalize on the 500 Requests-Per-Day free tier allowance.
+- Increased Orchestrator timeout boundaries from 5s to 30s to gracefully accommodate slow-path deep Gemini inferences.
+### Fixed
+- Injected a critically missing `storage` Terraform module into the `prod` infrastructure configuration to prevent user-data bucket provisioning failures.
+
 ## [v2.1.0] - 2026-06-14
 ### Changed
 - **Major Architectural Pivot:** Ripped out raw `google-genai` manual API chaining. Migrated the Orchestrator and Profiler to **Google ADK 2.0** (`google-adk`).
