@@ -199,3 +199,19 @@ Initially, the Orchestrator utilized `gemini-2.5-flash`, which is an incredibly 
 To overcome this bottleneck without attaching a corporate billing account, the entire mesh was seamlessly migrated to **`gemini-3.1-flash-lite`**. This strategic downgrade trades a microscopic fraction of reasoning capacity for a massive **500 Requests Per Day (RPD)** allowance. This ensures the mesh stays fully operational and free-tier compliant, even during rigorous load testing.
 
 ![Gemini API Rate Limit](docs/images/api_rate_limit.png)
+
+---
+
+## 🛑 The Zero-Billing Killswitch
+To ensure absolute zero-billing when the platform is not actively being developed or tested, we provide a "nuke" approach that instantly destroys all provisioned GCP infrastructure. 
+
+To completely delete the project and all associated billing:
+```bash
+gcloud projects delete [YOUR_PROJECT_ID] --quiet
+```
+
+Alternatively, to retain the Project shell but destroy all Terraformed infrastructure, you can manually trigger the **`6-destroy-all-and-verify.yml`** GitHub Action pipeline, or run:
+```bash
+terraform -chdir=infrastructure/terraform/environments/prod destroy -auto-approve
+terraform -chdir=infrastructure/terraform/environments/test destroy -auto-approve
+```
